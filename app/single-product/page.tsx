@@ -13,8 +13,8 @@ export default function SingleProduct() {
     <>
       <Banner title="Product Details" breadcrumb="Product Details" />
       <Delivery />
-      <ProductPage />
-      <RecommendedProducts />
+      {/* <ProductPage />
+      <RecommendedProducts /> */}
       <ProductDetail />
       <DeliveryInformation />
       <CustomerTestimonials />
