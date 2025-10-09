@@ -21,7 +21,7 @@ interface TrendingProductsProps {
   product: WooProduct;
 }
 
-const ProductPage = ({ product }: TrendingProductsProps) => {
+const ProductInfo = ({ product }: TrendingProductsProps) => {
   const getDelay = useAutoDelay();
 
   const images = product.images;
@@ -204,4 +204,4 @@ const ProductPage = ({ product }: TrendingProductsProps) => {
   );
 };
 
-export default ProductPage;
+export default ProductInfo;

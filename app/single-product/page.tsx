@@ -2,7 +2,7 @@ import Banner from "@/components/Banner";
 import CustomerTestimonials from "@/components/ShopGrid/CustomerTestimonials";
 import News from "@/components/ShopGrid/News";
 import DailyUpdate from "@/components/ShopGrid/DailyUpdate";
-import ProductPage from "@/components/ProductPage/ProductPage";
+import ProductPage from "@/components/ProductPage/ProductInfo";
 import Delivery from "@/components/Delivery";
 import RecommendedProducts from "@/components/ProductPage/RecommendedProducts";
 import ProductDetail from "@/components/ProductPage/ProductDetail";
