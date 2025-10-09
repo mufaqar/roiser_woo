@@ -12,6 +12,8 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/woocommerce-api";
 
   export default async function SingleProduct({ params }: { params: { slug: string } }) {
   const product = await getProductBySlug(params.slug);
+
+  console.log("Fetched product in page.tsx:", product);
   if (!product) {
     return <div className="p-10">Product not found.</div>;
   }
@@ -22,7 +24,7 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/woocommerce-api";
     <>
       <Banner title={product.name} breadcrumb={product.name}  />
       <Delivery />
-      <ProductPage product={product} />
+      {/* <ProductPage product={product} /> */}
       <RecommendedProducts products={relatedProducts} />
       <ProductDetail />
       <DeliveryInformation />

@@ -24,7 +24,7 @@ interface TrendingProductsProps {
 const ProductPage = ({ product }: TrendingProductsProps) => {
   const getDelay = useAutoDelay();
 
-  const images = product.images || [];
+  const images = product.images;
   console.log("Product in ProductPage:", images);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
