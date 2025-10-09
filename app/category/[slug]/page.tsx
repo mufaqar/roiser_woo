@@ -1,3 +1,4 @@
+import Banner from "@/components/Banner";
 import ProductGrid from "@/components/ShopGrid/ProductGrid";
 import {
   getCategoryBySlug,
@@ -19,9 +20,12 @@ export default async function CategoryPage({
 
   const products = await getProductsByCategory(category.id);
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">{category.name}</h1>
+      <>
+      <Banner title={category.name} breadcrumb={category.name} />
+    
+       
       <ProductGrid products={products} />
-    </div>
+    
+    </>
   );
 }

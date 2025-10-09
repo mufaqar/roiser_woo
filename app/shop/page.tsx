@@ -14,7 +14,7 @@ export default async function ShopPage() {
      const categories = await getAllCategories();
   return (
     <>
-      <Banner title="Shop Grid" breadcrumb="Shop Grid" />
+      <Banner title="Shop" breadcrumb="Shop" />
       <FeaturedIcons />
       <Composite />
       <Delivery />
