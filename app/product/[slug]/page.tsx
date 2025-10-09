@@ -25,13 +25,13 @@ import ProductInfo from "@/components/ProductPage/ProductInfo";
     <>
       <Banner title={product.name} breadcrumb={product.name}  />
       <Delivery />
-      <ProductInfo product={product} />
+      {/* <ProductInfo product={product} />
       <RecommendedProducts products={relatedProducts} />
       <ProductDetail />
       <DeliveryInformation />
       <CustomerTestimonials />
       <News />
-      <DailyUpdate />
+      <DailyUpdate /> */}
     </>
   );
 }
