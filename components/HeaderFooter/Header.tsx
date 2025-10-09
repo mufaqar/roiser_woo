@@ -12,8 +12,8 @@ function Header() {
   const navLinks = [
     { name: "HOME", href: "/" },
     { name: "SHOP", href: "/shop" },
-    { name: "WOMEN", href: "/#" },
-    { name: "MEN", href: "#" },
+    { name: "Lamps", href: "/category/lamps" },
+    { name: "Mirror", href: "/category/wall-mirrors-online" },
     { name: "BLOG", href: "/blog" },
     { name: "CONTACT", href: "/contact-us" },
   ];

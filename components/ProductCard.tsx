@@ -1,22 +1,22 @@
-import { Product } from "@/types/woocommerce";
+import { WooProduct } from "@/lib/woocommerce-types";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { FaTruck } from "react-icons/fa";
 
 interface ProductCardProps {
-  item: Product;
+  item: WooProduct;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
-  console.log(item);
+  console.log("Product item:", item);
   return (
     <>
       <div className="px-3">
         <div className="bg-white rounded-sm p-2 shadow-sm overflow-hidden transition">
           <Link href={`/product/${item?.slug}`}>
             <Image
-              src={item?.images[0]?.src}
+              src={item?.images[0]?.src }
               alt={item.name}
               width={400}
               height={300}

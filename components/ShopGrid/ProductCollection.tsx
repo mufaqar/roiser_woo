@@ -3,25 +3,19 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { CiMenuFries } from "react-icons/ci";
-import { FaTruck } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
-import Image from "next/image";
-import ProductCard from "../ProductCard";
 
-interface Product {
-  id: number;
-  image: string;
-  name: string;
-  rating: number;
-  reviews: number;
-  currentPrice: string;
-  originalPrice: string;
-  paymentPlan: string;
-  expressDelivery: string;
+import ProductCard from "../ProductCard";
+import { WooCategory, WooProduct } from "@/lib/woocommerce-types";
+
+interface ProductCollectionProps {
+  cat: WooCategory[];
+  products: WooProduct[];
 }
 
-const ProductCollection: React.FC = () => {
+
+const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => {
   const getDelay = useAutoDelay();
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
   const [selectedItemSize, setSelectedItemSize] = useState<string>("All");
@@ -29,31 +23,7 @@ const ProductCollection: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
-  const products: Product[] = [
-    {
-      id: 1,
-      image: "/images/card-img.png",
-      name: "3 Seat Real Leather Electric Recliner Home Cinema Theatre Sofa...",
-      rating: 4,
-      reviews: 19,
-      currentPrice: "$259.00",
-      originalPrice: "$384.00",
-      paymentPlan: "Pay $23.99 / 12m with",
-      expressDelivery: "Express Delivery in 3-10 Days",
-    },
-    {
-      id: 2,
-      image: "/images/card-img.png",
-      name: "3 Seat Real Leather Electric Recliner Home Cinema Theatre Sofa...",
-      rating: 4,
-      reviews: 19,
-      currentPrice: "$259.00",
-      originalPrice: "$384.00",
-      paymentPlan: "Pay $23.99 / 12m with",
-      expressDelivery: "Express Delivery in 3-10 Days",
-    },
-  ];
-
+  
   const handleBrandChange = (brand: string) => {
     setSelectedBrands((prev) =>
       prev.includes(brand)

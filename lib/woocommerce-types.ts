@@ -1,4 +1,7 @@
-export interface Product {
+/**
+ * WooCommerce Product Type
+ */
+export interface WooProduct {
   id: number;
   name: string;
   slug: string;
@@ -31,18 +34,13 @@ export interface Product {
   tax_class: string;
   manage_stock: boolean;
   stock_quantity: number | null;
-  stock_status: string;
   backorders: string;
   backorders_allowed: boolean;
   backordered: boolean;
   low_stock_amount: number | null;
   sold_individually: boolean;
   weight: string;
-  dimensions: {
-    length: string;
-    width: string;
-    height: string;
-  };
+  dimensions: WooDimensions;
   shipping_required: boolean;
   shipping_taxable: boolean;
   shipping_class: string;
@@ -55,33 +53,51 @@ export interface Product {
   cross_sell_ids: number[];
   parent_id: number;
   purchase_note: string;
-  categories: Category[];
-  tags: any[];
-  images: Image[];
-  attributes: Attribute[];
-  default_attributes: any[];
+  categories: WooCategory[];
+  tags: WooTag[];
+  images: WooImage[];
+  attributes: WooAttribute[];
+  default_attributes: WooDefaultAttribute[];
   variations: number[];
-  grouped_products: any[];
+  grouped_products: number[];
   menu_order: number;
-  price_html: string;
-  meta_data: any[];
-  expressDelivery?: string;
+  meta_data: WooMetaData[];
+  stock_status: "instock" | "outofstock" | "onbackorder";
+  has_options?: boolean;
+  _links?: WooLinks;
+  expressDelivery?: string; 
   paymentPlan?: string;
+  
 }
 
-export interface Category {
+/**
+ * Product Dimensions
+ */
+export interface WooDimensions {
+  length: string;
+  width: string;
+  height: string;
+}
+
+/**
+ * Product Category
+ */
+export interface WooCategory {
   id: number;
   name: string;
   slug: string;
   parent: number;
   description: string;
   display: string;
-  image: Image | null;
+  image: WooImage | null;
   menu_order: number;
   count: number;
 }
 
-export interface Image {
+/**
+ * Product Image
+ */
+export interface WooImage {
   id: number;
   date_created: string;
   date_modified: string;
@@ -90,7 +106,10 @@ export interface Image {
   alt: string;
 }
 
-export interface Attribute {
+/**
+ * Product Attribute
+ */
+export interface WooAttribute {
   id: number;
   name: string;
   position: number;
@@ -99,45 +118,41 @@ export interface Attribute {
   options: string[];
 }
 
-export interface Customer {
+/**
+ * Default Attribute
+ */
+export interface WooDefaultAttribute {
   id: number;
-  date_created: string;
-  date_modified: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: string;
-  username: string;
-  billing: Address;
-  shipping: Address;
-  is_paying_customer: boolean;
-  avatar_url: string;
+  name: string;
+  option: string;
 }
 
-export interface Address {
-  first_name: string;
-  last_name: string;
-  company: string;
-  address_1: string;
-  address_2: string;
-  city: string;
-  state: string;
-  postcode: string;
-  country: string;
-  email?: string;
-  phone: string;
+/**
+ * Product Tag
+ */
+export interface WooTag {
+  id: number;
+  name: string;
+  slug: string;
 }
 
-export interface LoginResponse {
-  token: string;
-  user_email: string;
-  user_nicename: string;
-  user_display_name: string;
+/**
+ * Meta Data
+ */
+export interface WooMetaData {
+  id: number;
+  key: string;
+  value: any;
 }
 
-export interface AuthState {
-  user: Customer | null;
-  token: string | null;
-  isLoading: boolean;
-  isAuthenticated: boolean;
+/**
+ * Links
+ */
+export interface WooLinks {
+  self: WooLink[];
+  collection: WooLink[];
+}
+
+export interface WooLink {
+  href: string;
 }

@@ -8,15 +8,18 @@ import Hero from "@/components/Home/Hero";
 import OnlineFurnitureSeller from "@/components/Home/OnlineFurnitureSeller";
 import OurLatestCollection from "@/components/Home/OurLatestCollection";
 import SellingCollection from "@/components/Home/SellingCollection";
+import { getAllCategories, getAllProducts } from "@/lib/woocommerce-api";
 
-export default function Home() {
+export default async function Home() {
+  const products = await getAllProducts();
+  const categories = await getAllCategories();
   return (
     <>
       <Hero />
       <FeaturedIcons />
       <SellingCollection />
       <FlatSale />
-      <OurLatestCollection />
+      <OurLatestCollection cat={categories} products={products} />
       <Delivery />
       <OnlineFurnitureSeller />
       <CustomerTestimonials />
