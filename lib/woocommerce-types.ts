@@ -65,9 +65,8 @@ export interface WooProduct {
   stock_status: "instock" | "outofstock" | "onbackorder";
   has_options?: boolean;
   _links?: WooLinks;
-  expressDelivery?: string; 
+  expressDelivery?: string;
   paymentPlan?: string;
-  
 }
 
 /**
@@ -91,7 +90,14 @@ export interface WooCategory {
   display: string;
   image: WooImage | null;
   menu_order: number;
-  count: number;
+  count: number;  
+}
+
+// ✅ Type used for sending params in your API request
+export interface CatParams {
+  parent?: number;
+  hide_empty?: boolean;
+  per_page?: number;
 }
 
 /**

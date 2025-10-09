@@ -9,10 +9,33 @@ import OnlineFurnitureSeller from "@/components/Home/OnlineFurnitureSeller";
 import OurLatestCollection from "@/components/Home/OurLatestCollection";
 import SellingCollection from "@/components/Home/SellingCollection";
 import { getAllCategories, getAllProducts } from "@/lib/woocommerce-api";
+import { wooApi } from "@/lib/woocommerce";
+import { CatParams, WooCategory } from "@/lib/woocommerce-types";
+
+export async function getParentCategories(): Promise<WooCategory[]> {
+  try {
+    const params: CatParams = {
+      per_page: 100,
+      parent: 0,
+      hide_empty: true,
+    };
+
+    const { data } = await wooApi.get<WooCategory[]>("products/categories", params);
+    return data;
+  } catch (error: any) {
+    console.error(
+      "Error fetching categories:",
+      error.response?.data || error.message
+    );
+    return [];
+  }
+}
+
 
 export default async function Home() {
   const products = await getAllProducts();
-  const categories = await getAllCategories();
+  const categories = await getParentCategories();
+
   return (
     <>
       <Hero />
