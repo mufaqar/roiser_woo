@@ -1,10 +1,10 @@
 "use client";
 
+import { WooProduct } from "@/lib/woocommerce-types";
 import ProductCard from "../ProductCard";
-import { Product } from "@/types/woocommerce";
 
 interface ProductGridProps {
-  products: Product[];
+  products: WooProduct[];
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({ 
