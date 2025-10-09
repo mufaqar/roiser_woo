@@ -4,44 +4,17 @@ import { FaTruck } from "react-icons/fa";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
 import Image from "next/image";
 import Link from "next/link";
+import { WooProduct } from "@/lib/woocommerce-types";
 
-const RecommendedProducts = () => {
+
+interface TrendingProductsProps {
+  products: WooProduct[];
+}
+
+
+const RecommendedProducts = ({products}:TrendingProductsProps) => {
   const getDelay = useAutoDelay();
-  const products = [
-    {
-      id: 1,
-      image: "/images/card-img.png",
-      name: "3 Seat Real Leather Electric Recliner Home Cinema Theatre Sofa...",
-      rating: 4,
-      reviews: 19,
-      currentPrice: "$259.00",
-      originalPrice: "$384.00",
-      paymentPlan: "Pay $23.99 / 12m with",
-      expressDelivery: "Express Delivery in 3-10 Days",
-    },
-    {
-      id: 2,
-      image: "/images/card-img.png",
-      name: "2 Seat Fabric Recliner Sofa with Cup Holders...",
-      rating: 5,
-      reviews: 24,
-      currentPrice: "$199.00",
-      originalPrice: "$289.00",
-      paymentPlan: "Pay $16.99 / 12m with",
-      expressDelivery: "Express Delivery in 3-8 Days",
-    },
-    {
-      id: 3,
-      image: "/images/card-img.png",
-      name: "Leather Home Cinema Recliner with Storage Console...",
-      rating: 4,
-      reviews: 32,
-      currentPrice: "$299.00",
-      originalPrice: "$399.00",
-      paymentPlan: "Pay $25.99 / 12m with",
-      expressDelivery: "Express Delivery in 5-12 Days",
-    },
-  ];
+ 
 
   return (
     <section className="py-16 bg-gray-50">
@@ -60,7 +33,7 @@ const RecommendedProducts = () => {
               >
                 <Link href='/single-product'>
                   <Image
-                    src={product.image}
+                    src={product.images[0].src}
                     alt={product.name}
                     width={400}
                     height={300}
@@ -86,7 +59,7 @@ const RecommendedProducts = () => {
                         <svg
                           key={i}
                           xmlns="http://www.w3.org/2000/svg"
-                          className={`h-4 w-4 ${i < product.rating
+                          className={`h-4 w-4 ${i < product.rating_count
                             ? "fill-current"
                             : "text-gray-300 stroke-current"
                             }`}
@@ -98,7 +71,7 @@ const RecommendedProducts = () => {
                       ))}
                     </div>
                     <span className="ml-2 text-sm text-title">
-                      {product.reviews} reviews
+                      {product.rating_count} reviews
                     </span>
                   </div>
 
@@ -111,10 +84,10 @@ const RecommendedProducts = () => {
                   {/* Price */}
                   <div className="flex items-baseline mb-2">
                     <p className="text-xl font-bold text-[#F2675D] mr-2">
-                      {product.currentPrice}
+                      {product.sale_price}
                     </p>
                     <p className="text-sm text-title line-through">
-                      {product.originalPrice}
+                      {product.price}
                     </p>
                   </div>
 
