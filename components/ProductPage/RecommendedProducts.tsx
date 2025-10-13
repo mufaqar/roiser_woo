@@ -14,8 +14,9 @@ interface TrendingProductsProps {
 
 const RecommendedProducts = ({products}:TrendingProductsProps) => {
   const getDelay = useAutoDelay();
- 
 
+  const cappedProducts = products.slice(0, 3);
+  
   return (
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -26,12 +27,12 @@ const RecommendedProducts = ({products}:TrendingProductsProps) => {
         </AnimateOnScroll>
         <AnimateOnScroll type="fade-up" delay={getDelay()}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {cappedProducts.map((product) => (
               <div
                 key={product.id}
                 className="bg-white rounded-md shadow-md overflow-hidden p-3 hover:shadow-lg transition-shadow duration-300"
               >
-                <Link href='/single-product'>
+                <Link href={`/product/${product.slug}`}>
                   <Image
                     src={product.images[0].src}
                     alt={product.name}
@@ -76,7 +77,7 @@ const RecommendedProducts = ({products}:TrendingProductsProps) => {
                   </div>
 
                   {/* Product Title */}
-                  <Link href='/single-product'>
+                  <Link href={`/product/${product.slug}`}>
                     <h3 className="text-base font-semibold text-title mb-2 line-clamp-2">
                       {product.name}
                     </h3>

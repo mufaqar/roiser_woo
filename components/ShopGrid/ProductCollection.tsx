@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import React, { useState } from "react";
 import { CiMenuFries } from "react-icons/ci";
 import { RxCross2 } from "react-icons/rx";
-import AnimateOnScroll, { useAutoDelay } from "../Animation";
 
 import ProductCard from "../ProductCard";
 import { WooCategory, WooProduct } from "@/lib/woocommerce-types";
@@ -16,7 +14,6 @@ interface ProductCollectionProps {
 
 
 const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => {
-  const getDelay = useAutoDelay();
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
   const [selectedItemSize, setSelectedItemSize] = useState<string>("All");
   const [minPrice, setMinPrice] = useState<string>("");
@@ -67,40 +64,165 @@ const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => 
   ];
 
   return (
-    <div className="container mx-auto p-4 mt-6">
-      <AnimateOnScroll type="fade-up" delay={getDelay()}>
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex flex-col items-start">
-            <button
-              onClick={() => setIsFilterModalOpen(true)}
-              className="flex gap-1 items-center px-3 py-1 border border-gray-300 rounded-md text-sm text-title"
-            >
-              <CiMenuFries />
-              Filters
-            </button>
-            <div className="flex items-center space-x-2 bg-gray-100 rounded-md px-2 py-1 text-sm mt-5">
-              <span>Tag X</span>
-              <button>
-                <RxCross2 />
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col lg:flex-row gap-8">
+
+        {/* Sidebar Filters - Desktop */}
+        <aside className="hidden lg:block w-[250px] flex-shrink-0">
+          <div className="sticky top-24 space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-title">Filters</h2>
+              <button
+                onClick={handleClearAll}
+                className="text-sm text-primary hover:underline font-medium"
+              >
+                Clear all
+              </button>
+            </div>
+
+            {/* Brand Filter */}
+            <div className="pb-6 border-b border-gray-200">
+              <h3 className="text-base font-semibold text-title mb-4">Brand</h3>
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {brands.map((brand) => (
+                  <label
+                    key={brand}
+                    className="flex items-center text-sm text-gray-700 hover:text-title cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedBrands.includes(brand)}
+                      onChange={() => handleBrandChange(brand)}
+                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300 rounded mr-3"
+                    />
+                    {brand}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Item Size Filter */}
+            <div className="pb-6 border-b border-gray-200">
+              <h3 className="text-base font-semibold text-title mb-4">Size</h3>
+              <div className="space-y-3">
+                {itemSizes.map((size) => (
+                  <label
+                    key={size}
+                    className="flex items-center text-sm text-gray-700 hover:text-title cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="itemSize"
+                      value={size}
+                      checked={selectedItemSize === size}
+                      onChange={(e) => setSelectedItemSize(e.target.value)}
+                      className="w-4 h-4 text-primary focus:ring-primary border-gray-300 mr-3"
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Price Filter */}
+            <div className="pb-6">
+              <h3 className="text-base font-semibold text-title mb-4">Price Range</h3>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  placeholder="Min"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                />
+                <span className="text-gray-400">-</span>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                />
+              </div>
+              <button
+                onClick={handleApplyFilters}
+                className="w-full mt-4 bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors font-medium text-sm"
+              >
+                Apply Filters
               </button>
             </div>
           </div>
-          <p className="text-sm text-gray-600">Showing 3 of 100</p>
-        </div>
+        </aside>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-           <ProductCard key={product.id} item={product} />
-          ))}
-        </div>
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          {/* Top Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Mobile Filter Button */}
+              <button
+                onClick={() => setIsFilterModalOpen(true)}
+                className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-title hover:bg-gray-50 transition-colors"
+              >
+                <CiMenuFries />
+                Filters
+              </button>
 
-        <div className="flex justify-center mt-8">
-          <Link href="/">
-            <button className="text-white bg-[#1B4965] px-7 py-2 hover:underline text-sm font-semibold rounded-sm">
-              Load More
-            </button>
-          </Link>
+              {/* Active Filters */}
+              {selectedBrands.length > 0 && (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {selectedBrands.map((brand) => (
+                    <span
+                      key={brand}
+                      className="flex items-center gap-1 bg-gray-100 text-gray-700 text-xs px-3 py-1 rounded-full"
+                    >
+                      {brand}
+                      <button
+                        onClick={() => handleBrandChange(brand)}
+                        className="hover:text-red-500"
+                      >
+                        <RxCross2 size={14} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <p className="text-sm text-gray-600 whitespace-nowrap">
+              Showing {products.length} of {products.length} products
+            </p>
+          </div>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {products && products.length > 0 ? (
+              products.map((product) => (
+                <ProductCard key={product.id} item={product} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-16">
+                <p className="text-gray-500 text-lg">No products found</p>
+                <button
+                  onClick={handleClearAll}
+                  className="mt-4 text-primary hover:underline font-medium"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Load More */}
+          {products.length > 0 && (
+            <div className="flex justify-center mt-10">
+              <button className="bg-primary text-white px-8 py-3 rounded-md hover:bg-primary/90 transition-colors font-semibold">
+                Load More Products
+              </button>
+            </div>
+          )}
         </div>
+      </div>
 
         {/* Filter Modal */}
         {isFilterModalOpen && (
@@ -216,7 +338,6 @@ const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => 
             </div>
           </div>
         )}
-      </AnimateOnScroll>
     </div>
   );
 };
