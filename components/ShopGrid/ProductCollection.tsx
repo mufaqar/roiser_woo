@@ -67,7 +67,7 @@ const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => 
   ];
 
   return (
-    <div className="container mx-auto p-4 mt-6">
+    <div className="mx-auto p-4 mt-6">
       <AnimateOnScroll type="fade-up" delay={getDelay()}>
         <div className="flex justify-between items-center mb-4">
           <div className="flex flex-col items-start">
@@ -89,9 +89,15 @@ const ProductCollection: React.FC<ProductCollectionProps> = ({cat,products}) => 
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-           <ProductCard key={product.id} item={product} />
-          ))}
+          {products && products.length > 0 ? (
+            products.map((product) => (
+              <ProductCard key={product.id} item={product} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-gray-500 text-lg">No products found</p>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-center mt-8">

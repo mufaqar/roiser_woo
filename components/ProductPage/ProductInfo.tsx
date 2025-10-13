@@ -16,6 +16,8 @@ import { BsChatSquareText } from "react-icons/bs";
 import Link from "next/link";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
 import { WooProduct } from "@/lib/woocommerce-types";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TrendingProductsProps {
   product: WooProduct;
@@ -28,63 +30,114 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
   console.log("Product in ProductPage:", images);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const mainImage = images[currentImageIndex]?.src;
+  const [quantity, setQuantity] = useState(1);
+  const [[activeIndex, direction], setActiveIndex] = useState([0, 0]);
 
   const handleThumbnailClick = (index: number) => {
+    const newDirection = index > activeIndex ? 1 : -1;
+    setActiveIndex([index, newDirection]);
     setCurrentImageIndex(index);
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+    const newIndex = (activeIndex + 1) % images.length;
+    setActiveIndex([newIndex, 1]);
+    setCurrentImageIndex(newIndex);
   };
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+    const newIndex = (activeIndex - 1 + images.length) % images.length;
+    setActiveIndex([newIndex, -1]);
+    setCurrentImageIndex(newIndex);
+  };
+
+  const handleIncrement = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const handleDecrement = () => {
+    setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   };
 
   return (
     <>
       <AnimateOnScroll type="fade-up" delay={getDelay()}>
-        <div className="flex flex-col lg:flex-row bg-white min-h-screen py-14 container mx-auto px-4">
+        <div className="flex flex-col lg:flex-row bg-white py-8 lg:py-12 container mx-auto px-4">
           {/* Image Gallery */}
 
-          <div className="w-full lg:w-1/2 p-8 flex flex-col items-center">
-            <div className="relative w-full max-w-4xl mb-6">
-              <img
-                src={mainImage}
-                alt="Product"
-                className="w-full h-[400px]  object-cover rounded-lg shadow-md"
-              />
+          <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col">
+            <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-lg bg-gray-50">
+              <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+                <motion.div
+                  key={currentImageIndex}
+                  custom={direction}
+                  variants={{
+                    enter: (direction: number) => ({
+                      x: direction > 0 ? '100%' : '-100%',
+                      opacity: 0
+                    }),
+                    center: {
+                      x: 0,
+                      opacity: 1
+                    },
+                    exit: (direction: number) => ({
+                      x: direction > 0 ? '-100%' : '100%',
+                      opacity: 0
+                    })
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={images[currentImageIndex]?.src}
+                    alt="Product"
+                    width={800}
+                    height={800}
+                    className="w-full h-full object-contain"
+                  />
+                </motion.div>
+              </AnimatePresence>
               <button
                 onClick={handlePrevImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-gray-100"
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 text-gray-700 z-10"
               >
-                &lt;
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
               <button
                 onClick={handleNextImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-md hover:bg-gray-100"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 text-gray-700 z-10"
               >
-                &gt;
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
-              <span className="absolute top-4 left-4 bg-white text-description text-xs px-3 py-1 rounded-full shadow-md">
+              <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-lg z-10">
                 Sale
               </span>
             </div>
-            <div className="flex space-x-4 overflow-x-auto pb-2">
-              {images.map((image, index) => (
-                <img
-                  key={image.id || index}
-                  src={image.src}
-                  alt={image.alt || `Thumbnail ${index + 1}`}
-                  className={`w-24 h-16 object-cover rounded-md cursor-pointer ${
-                    currentImageIndex === index
-                      ? "border-2 border-blue-500"
-                      : "border-2 border-gray-300"
-                  }`}
-                  onClick={() => handleThumbnailClick(index)}
-                />
-              ))}
+            <div className="w-full overflow-x-auto py-2 scrollbar-hide -mx-1">
+              <div className="flex gap-3 px-1">
+                {images.map((image, index) => (
+                  <Image
+                    key={image.id || index}
+                    src={image.src}
+                    width={120}
+                    height={120}
+                    alt={image.alt || `Thumbnail ${index + 1}`}
+                    className={`flex-shrink-0 w-20 h-20 object-cover rounded-md cursor-pointer transition-all duration-200 ${
+                      currentImageIndex === index
+                        ? "border-2 border-primary ring-2 ring-primary/20 scale-105"
+                        : "border-2 border-gray-200 hover:border-gray-300"
+                    }`}
+                    onClick={() => handleThumbnailClick(index)}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
@@ -161,30 +214,36 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
             </ul>
 
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-8">
-              <div className="flex items-center border border-gray-300 rounded-md">
-                <Link
-                  href=""
-                  className="p-3 border-r border-gray-300 text-gray-600 hover:bg-gray-100"
+              <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
+                <button
+                  onClick={handleDecrement}
+                  className="p-3 border-r border-gray-300 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-all duration-150 active:scale-95"
+                  disabled={quantity === 1}
                 >
-                  <FaMinus />
-                </Link>
-                <span className="p-3 text-lg font-semibold text-gray-800">
-                  1
+                  <FaMinus className={`transition-opacity ${quantity === 1 ? 'opacity-30' : 'opacity-100'}`} />
+                </button>
+                <span className="px-6 py-3 text-lg font-semibold text-gray-800 min-w-[60px] text-center transition-all duration-200">
+                  {quantity}
                 </span>
-                <button className="p-3 border-l border-gray-300 text-gray-600 hover:bg-gray-100">
+                <button
+                  onClick={handleIncrement}
+                  className="p-3 border-l border-gray-300 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-all duration-150 active:scale-95"
+                >
                   <FaPlus />
                 </button>
               </div>
               <Link
                 href="#"
-                className="flex-1  text-description py-3 px-6 rounded-md border-description border  transition duration-300 flex items-center justify-center"
+                className="flex-1 text-description py-3 px-6 rounded-md border-description border transition-all duration-300 flex items-center justify-center hover:bg-description hover:text-white active:scale-95"
               >
                 <FaHeart className="mr-2" /> ADD TO CART
               </Link>
             </div>
-            <button className="w-full cursor-pointer bg-primary text-white py-3 px-6 rounded-md  transition duration-300 mb-8">
-              <Link href="#">BUY THE ITEM NOW</Link>
-            </button>
+            <Link href="#" className="block w-full">
+              <button className="w-full cursor-pointer bg-primary text-white py-3 px-6 rounded-md transition-all duration-300 hover:bg-primary/90 hover:shadow-lg active:scale-95 mb-8">
+                BUY THE ITEM NOW
+              </button>
+            </Link>
 
             <div className="flex space-x-6 text-description text-sm">
               <div className="flex items-center cursor-pointer hover:text-gray-900">

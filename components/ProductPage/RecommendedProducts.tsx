@@ -31,7 +31,7 @@ const RecommendedProducts = ({products}:TrendingProductsProps) => {
                 key={product.id}
                 className="bg-white rounded-md shadow-md overflow-hidden p-3 hover:shadow-lg transition-shadow duration-300"
               >
-                <Link href='/single-product'>
+                <Link href={`/product/${product.slug}`}>
                   <Image
                     src={product.images[0].src}
                     alt={product.name}
@@ -76,7 +76,7 @@ const RecommendedProducts = ({products}:TrendingProductsProps) => {
                   </div>
 
                   {/* Product Title */}
-                  <Link href='/single-product'>
+                  <Link href={`/product/${product.slug}`}>
                     <h3 className="text-base font-semibold text-title mb-2 line-clamp-2">
                       {product.name}
                     </h3>
