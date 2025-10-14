@@ -203,13 +203,11 @@ function DailyUpdate() {
             ) : (
               <>
                 <Image
-                  // Use the generated thumbnail from state, with a fallback to a default image
                   src={videoThumbnails[video.id] || '/images/default-video-thumbnail.jpg'} 
                   alt={video.alt}
                   layout="fill"
                   objectFit="cover"
                   className="transition-transform duration-300 group-hover:scale-105"
-                  // Key here helps Next.js Image component update its src if thumbnail generates later
                   key={`video-thumbnail-${video.id}-${videoThumbnails[video.id] ? 'generated' : 'loading'}`}
                 />
                 {/* Overlay with gradient and text */}

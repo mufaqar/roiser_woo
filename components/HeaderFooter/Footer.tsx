@@ -134,13 +134,13 @@ function Footer() {
                 <div className="py-6 bg-[#DFDFE0] container mx-auto md:w-[90%] lg:w-[80%] xl:w-[80%]  rounded-t-xl px-6">
                     <div className=" flex flex-col md:flex-row justify-between items-center ">
                         <p className="text-gray-600 text-sm mb-4 md:mb-0">Copyright & Design 2024. All Right Reserved</p>
-                        <Image
+                        {/* <Image
                             src="/images/payment 2.png"
                             width={500}
                             height={500}
                             alt="Picture of the author"
                             className="h-6 w-auto md:w-auto"
-                        />
+                        /> */}
                     </div>
                 </div>
             </footer>

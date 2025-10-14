@@ -4,7 +4,6 @@ import { FaTruck } from "react-icons/fa";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
 import Image from "next/image";
 import Link from "next/link";
-import { WooProduct } from "@/lib/woocommerce-types";
 
 
 interface TrendingProductsProps {

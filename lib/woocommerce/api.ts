@@ -1,6 +1,4 @@
-import { wooApi } from "./woocommerce";
-import { WooProduct } from "./woocommerce-types";
-
+import { wooApi } from "./index";
 
 /**
  * Fetch all products

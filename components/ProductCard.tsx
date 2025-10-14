@@ -1,9 +1,10 @@
-import { WooProduct } from "@/lib/woocommerce-types";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FaTruck } from "react-icons/fa";
+import { FaTruck, FaHeart, FaRegHeart } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { formatCurrency } from "@/config/currency";
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface ProductCardProps {
   item: WooProduct;
@@ -12,6 +13,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   // State for image carousel (must be before any returns)
   const [[currentImageIndex, direction], setImageState] = useState([0, 0]);
+  const { toggleItemInWishlist, isInWishlist } = useWishlist();
 
   // Add safety check
   if (!item || !item.images || item.images.length === 0) {
@@ -39,6 +41,21 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
     const newIndex = (currentImageIndex - 1 + item.images.length) % item.images.length;
     setImageState([newIndex, -1]);
   };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleItemInWishlist({
+      id: item.id,
+      name: item.name,
+      price: parseFloat(item.price),
+      image: item.images[0]?.src,
+      slug: item.slug,
+      originalPrice: item.regular_price ? parseFloat(item.regular_price) : undefined,
+    });
+  };
+
+  const isFavorited = isInWishlist(item.id);
 
   return (
     <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col group">
@@ -78,6 +95,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
                 />
               </motion.div>
             </AnimatePresence>
+
+            {/* Wishlist Heart Icon */}
+            <button
+              onClick={handleToggleWishlist}
+              className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-full w-9 h-9 flex items-center justify-center shadow-md hover:bg-white hover:scale-110 transition-all duration-200 z-10"
+              aria-label={isFavorited ? "Remove from wishlist" : "Add to wishlist"}
+            >
+              {isFavorited ? (
+                <FaHeart className="text-red-500 text-lg" />
+              ) : (
+                <FaRegHeart className="text-gray-700 text-lg" />
+              )}
+            </button>
 
             {/* Discount Badge */}
             {hasDiscount && (
@@ -170,22 +200,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
         {/* Price */}
         <div className="mb-2">
           <span className="text-[#F2675D] text-lg font-bold mr-2">
-            ${item.price}
-          </span>
+            {formatCurrency(parseFloat(item.price))}
+          </span> 
           {item.regular_price && item.regular_price !== item.price && (
             <span className="text-gray-400 line-through text-sm">
-              ${item.regular_price}
+              {formatCurrency(parseFloat(item.regular_price))}
             </span>
           )}
         </div>
-
-        
 
         {/* Klarna Payment Option */}
         <div className="flex items-center gap-1.5 mb-2 flex-wrap">
           <span className="text-sm text-gray-600">or</span>
           <span className="text-sm font-semibold text-gray-900">
-            4 monthly payments of ${(parseFloat(item.price) / 4).toFixed(2)}
+            4 monthly payments of {formatCurrency(parseFloat(item.price) / 4)}
           </span>
           <span className="text-sm text-gray-600">with</span>
           <Image

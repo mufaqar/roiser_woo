@@ -10,10 +10,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'woocommerce-1531534-5907618.cloudwaysapps.com',
-      'via.placeholder.com'
-    ],
     remotePatterns: [
       {
         protocol: 'https',
@@ -25,7 +21,17 @@ const nextConfig = {
         hostname: 'via.placeholder.com',
         pathname: '**',
       },
+      {
+        protocol: 'https',
+        hostname: 'woocommerce-1531534-5907618.cloudwaysapps.com',
+        pathname: '**',
+      }
     ],
+  },
+  env: {
+    WC_STORE_URL: process.env.WC_STORE_URL,
+    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
+    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
   },
 }
 

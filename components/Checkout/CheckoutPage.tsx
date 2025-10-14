@@ -1,21 +1,59 @@
 "use client"
+
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import AnimateOnScroll, { useAutoDelay } from '../Animation';
+import useCart from '@/hooks/useCart';
+import { formatCurrency } from '@/config/currency';
+import { checkoutFormSchema, type CheckoutFormData } from '@/schemas/cartSchema';
+import Image from 'next/image';
 
 function CheckoutPage() {
   const getDelay = useAutoDelay();
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const router = useRouter();
+  const {
+    items,
+    cartTotal,
+    shippingCost,
+    grandTotal,
+  } = useCart();
 
-  const products = [
-    { id: 1, name: "Bong Color Sanddle", price: 900.00, image: "/images/card-img.png" },
-    { id: 2, name: "Chiara Loko Bag", price: 900.00, image: "/images/card-img.png" },
-    { id: 3, name: "Modern Elegant Bag", price: 900.00, image: "/images/card-img.png" },
-  ];
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      companyName: '',
+      country: 'United Kingdom',
+      streetAddress: '',
+      apartment: '',
+      townCity: '',
+      state: '',
+      zipCode: '',
+      phone: '',
+      orderNotes: '',
+      paymentMethod: 'stripe',
+      agreeToTerms: false,
+    },
+  });
 
-  const subtotal = products.reduce((sum, product) => sum + product.price, 0);
-  const shipping = 50.00;
-  const total = subtotal + shipping;
+  const agreeToTerms = watch('agreeToTerms');
+
+  const onSubmit = (data: CheckoutFormData) => {
+    console.log('Checkout data:', data);
+    console.log('Cart items:', items);
+    // TODO: Implement order submission logic
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen  font-sans container mx-auto px-4">
@@ -32,72 +70,162 @@ function CheckoutPage() {
       </AnimateOnScroll>
       <div className="  mt-10">
         <AnimateOnScroll type="fade-up" delay={getDelay()}>
-          <div className="flex flex-col lg:flex-row gap-12">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col lg:flex-row gap-12">
             {/* Left Section - Billing Details */}
             <div className="lg:w-3/5">
               <AnimateOnScroll type="fade-up" delay={getDelay()}>
                 <h2 className="text-2xl font-bold text-title  mb-6">Billing Details</h2>
               </AnimateOnScroll>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-medium text-title  mb-1">First Name*</label>
+                  <input
+                    type="text"
+                    id="firstName"
+                    {...register('firstName')}
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.firstName && (
+                    <p className="text-xs text-red-500 mt-1">{errors.firstName.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-medium text-title  mb-1">Last Name*</label>
+                  <input
+                    type="text"
+                    id="lastName"
+                    {...register('lastName')}
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.lastName && (
+                    <p className="text-xs text-red-500 mt-1">{errors.lastName.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-title  mb-1">Email*</label>
+                  <input
+                    type="text"
+                    id="email"
+                    {...register('email')}
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.email && (
+                    <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-title  mb-1">Company Name (Optional)</label>
+                  <input
+                    type="text"
+                    id="companyName"
+                    {...register('companyName')}
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                </div>
+
                 <div className="md:col-span-2">
-                  <label htmlFor="first_name" className="block text-sm font-medium text-title  mb-1">First Name*</label>
-                  <input type="text" id="first_name" className="w-full p-3 border border-gray-300 rounded-md outline-none" />
-                </div>
-
-                <div>
-                  <label htmlFor="last_name" className="block text-sm font-medium text-title  mb-1">Last Name*</label>
-                  <input type="text" id="last_name" className="w-full p-3 border border-gray-300 rounded-md outline-none" />
-                </div>
-
-                <div>
-                  <label htmlFor="company_name" className="block text-sm font-medium text-title  mb-1">Company Name (Optional)*</label>
-                  <input type="text" id="company_name" className="w-full p-3 border border-gray-300 rounded-md outline-none" />
-                </div>
-
-                <div>
-                  <label htmlFor="country" className="block text-sm font-medium text-title outline-none mb-1">Country / Region*</label>
-                  <select id="country" className="w-full p-3  border border-gray-300 rounded-md  outline-none bg-white">
-                    <option>United States (US)</option>
-                    <option>Canada</option>
-                    <option>Mexico</option>
-                  </select>
+                  <label htmlFor="country" className="block text-sm font-medium text-title outline-none mb-1">Country*</label>
+                  <input
+                    type="text"
+                    id="country"
+                    {...register('country')}
+                    value="United Kingdom"
+                    readOnly
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none bg-gray-50"
+                  />
+                  {errors.country && (
+                    <p className="text-xs text-red-500 mt-1">{errors.country.message}</p>
+                  )}
                 </div>
 
                 <div className="md:col-span-2">
-                  <label htmlFor="street_address" className="block text-sm font-medium text-title outline-none  mb-1">Street Address*</label>
-                  <input type="text" id="street_address" placeholder="House number and street number" className="w-full outline-none p-3 border border-gray-300 rounded-md  mb-3" />
-                  <input type="text" placeholder="Apartment, suite, unit, etc. (optional)" className="w-full p-3 outline-none  border border-gray-300 rounded-md " />
+                  <label htmlFor="streetAddress" className="block text-sm font-medium text-title outline-none  mb-1">Street Address*</label>
+                  <input
+                    type="text"
+                    id="streetAddress"
+                    {...register('streetAddress')}
+                    placeholder="House number and street number"
+                    className="w-full outline-none p-3 border border-gray-300 rounded-md  mb-3"
+                  />
+                  {errors.streetAddress && (
+                    <p className="text-xs text-red-500 mb-3">{errors.streetAddress.message}</p>
+                  )}
+                  <input
+                    type="text"
+                    {...register('apartment')}
+                    placeholder="Apartment, suite, unit, etc. (optional)"
+                    className="w-full p-3 outline-none  border border-gray-300 rounded-md "
+                  />
                 </div>
 
                 <div>
-                  <label htmlFor="town_city" className="block text-sm font-medium text-title  mb-1">Town / City*</label>
-                  <input type="text" id="town_city" className="w-full p-3 border border-gray-300 rounded-md  outline-none" />
+                  <label htmlFor="townCity" className="block text-sm font-medium text-title  mb-1">Town / City*</label>
+                  <input
+                    type="text"
+                    id="townCity"
+                    {...register('townCity')}
+                    className="w-full p-3 border border-gray-300 rounded-md  outline-none"
+                  />
+                  {errors.townCity && (
+                    <p className="text-xs text-red-500 mt-1">{errors.townCity.message}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="state" className="block text-sm font-medium text-title outline-none  mb-1">State*</label>
-                  <select id="state" className="w-full p-3 border border-gray-300 rounded-md outline-none  bg-white">
-                    <option>California</option>
-                    <option>New York</option>
-                    <option>Texas</option>
-                  </select>
+                  <label htmlFor="state" className="block text-sm font-medium text-title outline-none  mb-1">County (Optional)</label>
+                  <input
+                    type="text"
+                    id="state"
+                    {...register('state')}
+                    placeholder="e.g., Greater London, West Midlands"
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.state && (
+                    <p className="text-xs text-red-500 mt-1">{errors.state.message}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="zip_code" className="block text-sm font-medium text-title  mb-1">Zip Code*</label>
-                  <input type="text" id="zip_code" className="w-full p-3 border border-gray-300 rounded-md outline-none" />
+                  <label htmlFor="zipCode" className="block text-sm font-medium text-title  mb-1">Postcode*</label>
+                  <input
+                    type="text"
+                    id="zipCode"
+                    {...register('zipCode')}
+                    placeholder="e.g., SW1A 1AA"
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.zipCode && (
+                    <p className="text-xs text-red-500 mt-1">{errors.zipCode.message}</p>
+                  )}
                 </div>
 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-title  mb-1">Phone*</label>
-                  <input type="tel" id="phone" className="w-full p-3 border border-gray-300 rounded-md outline-none" />
+                  <input
+                    type="tel"
+                    id="phone"
+                    {...register('phone')}
+                    placeholder="e.g., 07123 456789"
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  />
+                  {errors.phone && (
+                    <p className="text-xs text-red-500 mt-1">{errors.phone.message}</p>
+                  )}
                 </div>
 
                 <div className="md:col-span-2">
-                  <label htmlFor="order_notes" className="block text-sm font-medium text-title  mb-1">Order Notes*</label>
-                  <textarea id="order_notes" rows={4} className="w-full p-3 border border-gray-300 rounded-md outline-none"></textarea>
+                  <label htmlFor="orderNotes" className="block text-sm font-medium text-title  mb-1">Order Notes (Optional)</label>
+                  <textarea
+                    id="orderNotes"
+                    {...register('orderNotes')}
+                    rows={4}
+                    className="w-full p-3 border border-gray-300 rounded-md outline-none"
+                  ></textarea>
                 </div>
-              </form>
+              </div>
             </div>
 
             {/* Right Section - Your Order */}
@@ -113,58 +241,82 @@ function CheckoutPage() {
                   </div>
 
                   {/* Product List */}
-                  {products.map(product => (
-                    <div key={product.id} className="flex justify-between items-center py-3">
-                      <div className="flex items-center space-x-3">
-                        <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded" />
-                        <span className="text-sm text-title ">{product.name}</span>
-                      </div>
-                      <span className="text-sm font-medium text-title ">${product.price.toFixed(2)}</span>
+                  {items.length === 0 ? (
+                    <div className="py-6 text-center text-gray-500">
+                      <p>Your cart is empty</p>
+                      <Link href="/shop" className="text-[#2F4761] hover:underline mt-2 inline-block">
+                        Continue Shopping
+                      </Link>
                     </div>
-                  ))}
+                  ) : (
+                    items.map(item => (
+                      <div key={item.id} className="flex justify-between items-center py-3">
+                        <div className="flex items-center space-x-3">
+                          <Image
+                            src={item.image}
+                            alt={item.name || 'Product'}
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                          <div>
+                            <span className="text-sm text-title block">{item.name || 'Product'}</span>
+                            <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
+                          </div>
+                        </div>
+                        <span className="text-sm font-medium text-title">{formatCurrency(item.price * item.quantity)}</span>
+                      </div>
+                    ))
+                  )}
 
                   {/* Subtotal */}
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-sm font-medium text-title ">Subtotal</span>
-                    <span className="text-sm font-semibold text-title ">${subtotal.toFixed(2)}</span>
+                    <span className="text-sm font-medium text-title">Subtotal</span>
+                    <span className="text-sm font-semibold text-title">{formatCurrency(cartTotal)}</span>
                   </div>
 
                   {/* Shipping */}
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-sm font-medium text-title ">Shipping</span>
-                    <span className="text-sm font-semibold text-title ">Flat rate: ${shipping.toFixed(2)}</span>
+                    <span className="text-sm font-medium text-title">Shipping</span>
+                    <span className="text-sm font-semibold text-title">
+                      {shippingCost === 0 ? 'Free' : formatCurrency(shippingCost)}
+                    </span>
                   </div>
 
                   {/* Total */}
                   <div className="flex justify-between items-center py-3">
-                    <span className="text-lg font-bold text-title ">Total Price:</span>
-                    <span className="text-lg font-bold text-[#2F4761]">${total.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-title">Total Price:</span>
+                    <span className="text-lg font-bold text-[#2F4761]">{formatCurrency(grandTotal)}</span>
                   </div>
                 </div>
 
                 {/* Payment Methods */}
-                <div className="mt-6 space-y-4">
-                  <div className="flex items-start">
-                    <input type="radio" id="direct_bank" name="payment_method" className="mt-1 h-4 w-4 text-[#2F4761] focus:ring-[#2F4761] border-gray-300" defaultChecked />
-                    <label htmlFor="direct_bank" className="ml-3 text-sm font-medium text-title ">
-                      Direct Bank Transfer
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold text-title mb-3">Payment Method</h3>
+                  <div className="flex items-start bg-white border border-gray-300 rounded-md p-4">
+                    <input
+                      type="radio"
+                      id="stripe"
+                      value="stripe"
+                      {...register('paymentMethod')}
+                      checked
+                      readOnly
+                      className="mt-1 h-4 w-4 text-[#2F4761] focus:ring-[#2F4761] border-gray-300"
+                    />
+                    <label htmlFor="stripe" className="ml-3 text-sm font-medium text-title flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Image src="/images/payments/stripe.webp" alt="Stripe" width={24} height={24} />
+                        <span>Credit / Debit Card (Stripe)</span>
+                        <span className="text-xs text-gray-500">🔒 Secure Payment</span>
+                      </div>
                       <p className="text-xs text-gray-500 mt-1">
-                        Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.
+                        Pay securely using your credit or debit card. Your payment information is encrypted and processed securely through Stripe. We accept Visa, Mastercard, and American Express. Apple Pay and Google Pay are also available for quick, contactless checkout on supported devices.
                       </p>
                     </label>
                   </div>
-                  <div className="flex items-center">
-                    <input type="radio" id="check_payments" name="payment_method" className="h-4 w-4 text-[#2F4761] focus:ring-[#2F4761] border-gray-300" />
-                    <label htmlFor="check_payments" className="ml-3 text-sm font-mediumt text-title ">Check Payments</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input type="radio" id="cash_on_delivery" name="payment_method" className="h-4 w-4 text-[#2F4761] focus:ring-[#2F4761] border-gray-300" />
-                    <label htmlFor="cash_on_delivery" className="ml-3 text-sm font-medium text-title ">Cash On Delivery</label>
-                  </div>
-                  <div className="flex items-center">
-                    <input type="radio" id="paypal" name="payment_method" className="h-4 w-4 text-[#2F4761] focus:ring-[#2F4761] border-gray-300" />
-                    <label htmlFor="paypal" className="ml-3 text-sm font-medium text-title ">Paypal</label>
-                  </div>
+                  {errors.paymentMethod && (
+                    <p className="text-xs text-red-500 mt-2">{errors.paymentMethod.message}</p>
+                  )}
                 </div>
 
                 <p className="text-xs text-gray-500 mt-6">
@@ -174,29 +326,29 @@ function CheckoutPage() {
                 <div className="flex items-center mt-6">
                   <input
                     type="checkbox"
-                    id="agree_terms"
-                    checked={agreeToTerms}
-                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    id="agreeToTerms"
+                    {...register('agreeToTerms')}
                     className="h-4 w-4 text-[#2F4761]  border-gray-300 rounded"
                   />
-                  <label htmlFor="agree_terms" className="ml-3 text-sm text-title ">
-                    I have read and agree terms and conditions *
+                  <label htmlFor="agreeToTerms" className="ml-3 text-sm text-title">
+                    I have read and agree to the terms and conditions *
                   </label>
                 </div>
+                {errors.agreeToTerms && (
+                  <p className="text-xs text-red-500 mt-1 ml-7">{errors.agreeToTerms.message}</p>
+                )}
 
                 <button
                   type="submit"
-                  className={`w-full py-3 mt-6 text-white font-semibold rounded-md transition-colors duration-300 
-                  ${agreeToTerms ? 'bg-[#2F4761] ' : 'bg-[#2F4761] cursor-not-allowed'}`}
-                  disabled={!agreeToTerms}
+                  className={`w-full py-3 mt-6 text-white font-semibold rounded-md transition-colors duration-300
+                  ${agreeToTerms && items.length > 0 ? 'bg-[#2F4761] hover:bg-[#1f3347]' : 'bg-gray-400 cursor-not-allowed'}`}
+                  disabled={!agreeToTerms || items.length === 0}
                 >
-                  <Link href="/">
-                    PLACE ORDER
-                  </Link>
+                  PLACE ORDER
                 </button>
               </div>
             </div>
-          </div>
+          </form>
         </AnimateOnScroll>
       </div>
     </div>

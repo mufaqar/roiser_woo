@@ -10,14 +10,17 @@ import {
   FaMinus,
   FaHeart,
   FaShareAlt,
+  FaRegHeart,
 } from "react-icons/fa";
 import { BiGitCompare } from "react-icons/bi";
 import { BsChatSquareText } from "react-icons/bs";
 import Link from "next/link";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
-import { WooProduct } from "@/lib/woocommerce-types";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import useCart from "@/hooks/useCart";
+import { formatCurrency } from "@/config/currency";
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface TrendingProductsProps {
   product: WooProduct;
@@ -25,6 +28,9 @@ interface TrendingProductsProps {
 
 const ProductInfo = ({ product }: TrendingProductsProps) => {
   const getDelay = useAutoDelay();
+
+  const { addItemToCart } = useCart();
+  const { toggleItemInWishlist, isInWishlist } = useWishlist();
 
   const images = product.images;
   console.log("Product in ProductPage:", images);
@@ -58,6 +64,30 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
   const handleDecrement = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   };
+
+  const handleAddToCart = () => {
+    addItemToCart({
+      id: product.id,
+      quantity: quantity,
+      price: parseFloat(product.price),
+      image: images[0]?.src || '',
+      originalPrice: parseFloat(product.regular_price),
+      name: product.name,
+    });
+  };
+
+  const handleToggleWishlist = () => {
+    toggleItemInWishlist({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      image: images[0]?.src || '',
+      slug: product.slug,
+      originalPrice: product.regular_price ? parseFloat(product.regular_price) : undefined,
+    });
+  };
+
+  const isFavorited = isInWishlist(product.id);
 
   return (
     <>
@@ -151,7 +181,17 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
               {product.name}
                 </h1>
               </div>
-              <FaRegStar className="text-description text-2xl cursor-pointer hover:text-description" />
+              <button
+                onClick={handleToggleWishlist}
+                className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200 active:scale-95"
+                aria-label={isFavorited ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                {isFavorited ? (
+                  <FaHeart className="text-red-500 text-2xl" />
+                ) : (
+                  <FaRegHeart className="text-description text-2xl" />
+                )}
+              </button>
             </div>
 
             <div className="flex items-center mb-6">
@@ -169,18 +209,18 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
 
             <div className="mb-6">
               <span className="text-description text-3xl font-bold mr-2">
-                ${product.price}
+                {formatCurrency(parseFloat(product.price))}
               </span>
               <span className="text-description line-through text-lg">
-               ${product.regular_price}
+                {formatCurrency(parseFloat(product.regular_price))}
               </span>
             </div>
 
           
-             <div
+            <div
             className="text-description leading-relaxed mb-6"
             dangerouslySetInnerHTML={{ __html: product.short_description }}
-          ></div>
+          />
 
             <p className="text-description flex items-center mb-6">
               <span className="w-3 h-3 bg-description rounded-full mr-2 animate-pulse"></span>
@@ -189,7 +229,7 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
 
             <div className="mb-6">
               <p className="text-description mb-2">
-                Only 15 items left in stock!
+                Only {product.stock_quantity ? product.stock_quantity : 15} items left in stock!
               </p>
               <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
@@ -232,12 +272,12 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                   <FaPlus />
                 </button>
               </div>
-              <Link
-                href="#"
+              <button
+                onClick={handleAddToCart}
                 className="flex-1 text-description py-3 px-6 rounded-md border-description border transition-all duration-300 flex items-center justify-center hover:bg-description hover:text-white active:scale-95"
               >
-                <FaHeart className="mr-2" /> ADD TO CART
-              </Link>
+                ADD TO CART
+              </button>
             </div>
             <Link href="#" className="block w-full">
               <button className="w-full cursor-pointer bg-primary text-white py-3 px-6 rounded-md transition-all duration-300 hover:bg-primary/90 hover:shadow-lg active:scale-95 mb-8">
