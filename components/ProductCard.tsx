@@ -7,6 +7,7 @@ import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { getProductVideo } from "@/lib/woocommerce/video-helpers";
+import useCart from "@/hooks/useCart";
 
 interface ProductCardProps {
   item: WooProduct;
@@ -17,6 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
 
   // State for image carousel (must be before any returns)
   const [[currentImageIndex, direction], setImageState] = useState([0, 0]);
+  const { addItemToCart } = useCart();
   const { toggleItemInWishlist, isInWishlist } = useWishlist();
 
   // Extract video information from meta_data
@@ -48,6 +50,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
     const newIndex = (currentImageIndex - 1 + item.images.length) % item.images.length;
     setImageState([newIndex, -1]);
   };
+
+  const handleAddToCart = () => {
+    addItemToCart({
+      id: item.id,
+      quantity: 1,
+      price: parseFloat(item.price),
+      image: item.images[0]?.src || '',
+      originalPrice: parseFloat(item.regular_price),
+      name: item.name,
+    });
+  };
+
 
   const handleToggleWishlist = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -263,10 +277,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
           <button
             className="w-full bg-white text-[#12213b] border border-[#12213b] py-2.5 px-4 rounded-md hover:bg-[#12213b] hover:text-white transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
           >
-            <FaSearch />
-            View Product
+            <Link href={`/product/${item.slug}`}>
+              <FaSearch />
+              View Product
+            </Link>
           </button>
           <button
+            onClick={handleAddToCart}
             className="w-full bg-[#12213b] text-white py-2.5 px-4 rounded-md hover:bg-[#12213b]/90 transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
           >
             <FaShoppingCart />
