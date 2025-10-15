@@ -9,7 +9,7 @@ const OnlineFurnitureSeller = () => {
 
   return (
 
-    <section className="bg-white py-16">
+    <section className="bg-white ">
       <div className=" flex flex-col md:flex-row items-stretch">
         {/* Left Side - Image */}
         <div className="w-full md:w-1/2 relative min-h-[350px] md:min-h-[500px]">
@@ -22,7 +22,7 @@ const OnlineFurnitureSeller = () => {
         </div>
 
         {/* Right Side - Text + Icons */}
-        <div className="w-full md:w-1/2 bg-primary text-white flex flex-col justify-center p-10 md:p-14">
+        <div className="w-full md:w-1/2 bg-[#1E2839] text-white flex flex-col justify-center p-10 md:p-14">
           <div className="container mx-auto px-4">
             <AnimateOnScroll type="fade-up" delay={getDelay()}>
               <h2 className="text-2xl md:text-4xl font-semibold mb-4">

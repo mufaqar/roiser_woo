@@ -6,7 +6,7 @@ import AnimateOnScroll, { useAutoDelay } from "./Animation";
 function Delivery() {
   const getDelay = useAutoDelay();
   return (
-    <section className="bg-[#F2675D] py-6">
+    <section className="bg-[#F2675D] py-2">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Left side */}
         <AnimateOnScroll type="fade-up" delay={getDelay()}>
@@ -28,11 +28,11 @@ function Delivery() {
           </div>
         </AnimateOnScroll>
         {/* Right side */}
-         <AnimateOnScroll type="fade-up" delay={getDelay()}>
+        <AnimateOnScroll type="fade-up" delay={getDelay()}>
         <div className="flex items-center gap-3 text-white text-center md:text-left">
           <FaTruck size={80} className="text-white" /> {/* ✅ React Icons Truck */}
           <div>
-            <h3 className="text-2xl md:text-6xl font-bold">FREE DELIVERY</h3>
+            <h3 className="text-xl md:text-4xl font-bold">FREE DELIVERY</h3>
             <p className="text-[#FFE223] font-medium text-sm md:text-xl">
               WE DELIVERED 4,000 MOST OF THE UK
             </p>
