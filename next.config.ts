@@ -1,0 +1,38 @@
+// import type { NextConfig } from "next";
+
+// const nextConfig: NextConfig = {
+//   /* config options here */
+// };
+
+// export default nextConfig;
+
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'woocommerce-1531534-5907618.cloudwaysapps.com',
+        pathname: '**',
+      }
+    ],
+  },
+  env: {
+    WC_STORE_URL: process.env.WC_STORE_URL,
+    WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
+    WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
+  },
+}
+
+module.exports = nextConfig
