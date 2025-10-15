@@ -33,6 +33,15 @@ const nextConfig = {
     WC_CONSUMER_KEY: process.env.WC_CONSUMER_KEY,
     WC_CONSUMER_SECRET: process.env.WC_CONSUMER_SECRET,
   },
+  async redirects() {
+    return [
+      {
+        source: '/wp-admin',
+        destination: `${process.env.WC_STORE_URL}/wp-admin/`,
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
