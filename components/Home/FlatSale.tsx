@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React from 'react';
 import AnimateOnScroll, { useAutoDelay } from '../Animation';
+import Image from 'next/image';
 
 
 function FlatSale() {
@@ -22,10 +23,12 @@ function FlatSale() {
           {/* Flat Sale Card 1 */}
           <AnimateOnScroll type="fade-up" delay={getDelay()}>
             <div className="relative w-full  bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-              <img
+              <Image
                 src="/images/flat-image-1.jpg"
                 alt="Unique Office Table"
                 className="w-full h-80 object-cover"
+                width={500}
+                height={500}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent opacity-80"></div>
               <div className="absolute top-8 left-8 text-white">
