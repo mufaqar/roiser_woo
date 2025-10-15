@@ -17,11 +17,12 @@ export default async function SingleProduct({ params }: { params: { slug: string
   if (!product) {
     return <div className="p-10">Product not found.</div>;
   }
+
   const categoryIds = product.categories?.map((cat: any) => cat.id) || [];
   const relatedProducts = await getRelatedProducts(categoryIds, product.id);
   return (
     <>
-      <Banner title={product.name} breadcrumb={product.name}  />
+      <Banner breadcrumb={product.name}  />
       <Delivery />
       <ProductInfo product={product} />
       <RecommendedProducts products={relatedProducts} />

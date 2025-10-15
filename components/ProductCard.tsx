@@ -1,21 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FaTruck, FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaTruck, FaHeart, FaRegHeart, FaShoppingCart, FaSearch, FaYoutube, FaPlay } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { getProductVideo } from "@/lib/woocommerce/video-helpers";
 
 interface ProductCardProps {
   item: WooProduct;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
+  console.log(JSON.stringify(item, null, 2));
+
   // State for image carousel (must be before any returns)
   const [[currentImageIndex, direction], setImageState] = useState([0, 0]);
   const { toggleItemInWishlist, isInWishlist } = useWishlist();
 
-  // Add safety check
+  // Extract video information from meta_data
+  const videoInfo = getProductVideo(item);
+  const hasVideo = videoInfo.url !== null;
+
   if (!item || !item.images || item.images.length === 0) {
     return null;
   }
@@ -56,7 +63,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   };
 
   const isFavorited = isInWishlist(item.id);
-
+  
   return (
     <div className="bg-white rounded-lg p-4 shadow-md hover:shadow-lg transition-shadow duration-200 h-full flex flex-col group">
       <div className="relative mb-3">
@@ -116,6 +123,24 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
               </span>
             )}
 
+            {/* Video Icon - Bottom Right */}
+            {hasVideo && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href={`/product/${item.slug}?video=play`}
+                    className="absolute bottom-2 right-2 bg-[#1E2839]/80 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-[#F2675D] hover:scale-110 transition-all duration-200 z-10"
+                    aria-label="Watch product video"
+                  >
+                    <FaPlay className="text-white text-sm ml-0.5" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Watch product video</p>
+                </TooltipContent>
+              </Tooltip>
+            )}
+
             {/* Navigation Arrows - Show on hover if multiple images */}
             {hasMultipleImages && (
               <>
@@ -157,15 +182,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
       <div className="flex-1 flex flex-col">
         {/* Tags */}
         <div className="flex items-center text-xs mb-2">
-          <span className="bg-[#EFF0F2] px-2 py-0.5 rounded-sm mr-2 text-title">
+          <div className="bg-[#EFF0F2] px-2 py-0.5 rounded-sm mr-2 text-title flex items-center gap-2">
+            {item.stock_status === 'instock' ? (
+              <div className="flex flex-shrink-0 items-center justify-center aspect-square h-[8px] w-[8px] bg-green-500 rounded-full"/>
+            ) : (
+              <div className="flex flex-shrink-0 items-center justify-center aspect-square h-[8px] w-[8px] bg-red-500 rounded-full"/>
+            )}
             {item.stock_status === 'instock' ? 'In stock' : 'Out of stock'}
-          </span>
-          {item.shipping_class && (
-            <div className="flex items-center gap-1 text-title bg-[#EFF0F2] p-1 px-3 rounded-sm">
-              <FaTruck size={14} />
-              <span>Express</span>
-            </div>
-          )}
+          </div>
+          <div className="bg-[#EFF0F2] px-2 py-0.5 rounded-sm mr-2 text-title flex items-center gap-2">
+            <FaTruck className="text-gray-600 text-sm flex-shrink-0" />
+            Express Delivery in {Math.floor(Math.random() * 8) + 2}-{Math.floor(Math.random() * 8) + 10} Days
+          </div>
         </div>
 
         {/* Rating */}
@@ -193,13 +221,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
 
         {/* Name */}
         <Link href={`/product/${item.slug}`} className="mb-2">
-          <h3 className="text-xl font-semibold text-title line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="text-3xl font-normal text-title line-clamp-2 hover:text-primary transition-colors">
             {item.name}
           </h3>
         </Link>
         {/* Price */}
         <div className="mb-2">
-          <span className="text-[#F2675D] text-lg font-bold mr-2">
+          <span className="text-[#F2675D] text-lg font-semibold mr-2">
             {formatCurrency(parseFloat(item.price))}
           </span> 
           {item.regular_price && item.regular_price !== item.price && (
@@ -211,26 +239,39 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
 
         {/* Klarna Payment Option */}
         <div className="flex items-center gap-1.5 mb-2 flex-wrap">
-          <span className="text-sm text-gray-600">or</span>
           <span className="text-sm font-semibold text-gray-900">
-            4 monthly payments of {formatCurrency(parseFloat(item.price) / 4)}
+            Pay in 3 installments of {formatCurrency(parseFloat(item.price) / 3)}
           </span>
           <span className="text-sm text-gray-600">with</span>
-          <Image
-            src="/images/payments/klarna.webp"
-            alt="Klarna"
-            width={55}
-            height={18}
-            className="h-5 w-auto object-contain"
-          />
+          <Tooltip>
+            <TooltipTrigger>
+              <Image
+                src="/images/payments/klarna.webp"
+                alt="Klarna"
+                width={55}
+                height={18}
+                className="h-5 w-auto object-contain transition-transform duration-300 hover:scale-110"
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Pay in 3 installments of {formatCurrency(parseFloat(item.price) / 3)} with 0% interest!</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
 
-        {/* Delivery Banner */}
-        <div className="flex items-center gap-2 bg-gray-50 px-2 py-1.5 rounded-md mb-2">
-          <FaTruck className="text-gray-600 text-sm flex-shrink-0" />
-          <span className="text-xs text-gray-700 font-medium">
-            Delivered in est. 4 weeks
-          </span>
+        <div className="rounded-sm mr-2 mt-2 text-title flex items-center gap-2 w-full">
+          <button
+            className="w-full bg-white text-[#12213b] border border-[#12213b] py-2.5 px-4 rounded-md hover:bg-[#12213b] hover:text-white transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
+          >
+            <FaSearch />
+            View Product
+          </button>
+          <button
+            className="w-full bg-[#12213b] text-white py-2.5 px-4 rounded-md hover:bg-[#12213b]/90 transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
+          >
+            <FaShoppingCart />
+            Add to Cart
+          </button>
         </div>
 
         {/* Stock Info */}

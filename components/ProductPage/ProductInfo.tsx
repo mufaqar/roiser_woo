@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaStar,
   FaRegStar,
@@ -11,16 +11,20 @@ import {
   FaHeart,
   FaShareAlt,
   FaRegHeart,
+  FaPlay,
 } from "react-icons/fa";
 import { BiGitCompare } from "react-icons/bi";
 import { BsChatSquareText } from "react-icons/bs";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import useCart from "@/hooks/useCart";
 import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
+import VideoPlayer from "../VideoPlayer";
+import { getProductVideo } from "@/lib/woocommerce/video-helpers";
 
 interface TrendingProductsProps {
   product: WooProduct;
@@ -28,16 +32,27 @@ interface TrendingProductsProps {
 
 const ProductInfo = ({ product }: TrendingProductsProps) => {
   const getDelay = useAutoDelay();
+  const searchParams = useSearchParams();
 
   const { addItemToCart } = useCart();
   const { toggleItemInWishlist, isInWishlist } = useWishlist();
 
   const images = product.images;
-  console.log("Product in ProductPage:", images);
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  // Extract video information from meta_data
+  const videoInfo = getProductVideo(product);
+  const hasVideo = videoInfo.url !== null;
+  const shouldAutoPlayVideo = searchParams.get('video') === 'play';
+
+  // If video should autoplay, start at -1 (video index), otherwise start at 0
+  const initialIndex = hasVideo && shouldAutoPlayVideo ? -1 : 0;
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(initialIndex);
   const [quantity, setQuantity] = useState(1);
-  const [[activeIndex, direction], setActiveIndex] = useState([0, 0]);
+  const [[activeIndex, direction], setActiveIndex] = useState([initialIndex, 0]);
+
+  // Calculate total items (images + video if exists)
+  const totalItems = images.length + (hasVideo ? 1 : 0);
 
   const handleThumbnailClick = (index: number) => {
     const newDirection = index > activeIndex ? 1 : -1;
@@ -46,13 +61,19 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
   };
 
   const handleNextImage = () => {
-    const newIndex = (activeIndex + 1) % images.length;
+    // Video is at index -1, images start at 0
+    const minIndex = hasVideo ? -1 : 0;
+    const maxIndex = images.length - 1;
+    const newIndex = activeIndex >= maxIndex ? minIndex : activeIndex + 1;
     setActiveIndex([newIndex, 1]);
     setCurrentImageIndex(newIndex);
   };
 
   const handlePrevImage = () => {
-    const newIndex = (activeIndex - 1 + images.length) % images.length;
+    // Video is at index -1, images start at 0
+    const minIndex = hasVideo ? -1 : 0;
+    const maxIndex = images.length - 1;
+    const newIndex = activeIndex <= minIndex ? maxIndex : activeIndex - 1;
     setActiveIndex([newIndex, -1]);
     setCurrentImageIndex(newIndex);
   };
@@ -121,13 +142,21 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                   transition={{ duration: 0.4, ease: 'easeInOut' }}
                   className="absolute inset-0"
                 >
-                  <Image
-                    src={images[currentImageIndex]?.src}
-                    alt="Product"
-                    width={800}
-                    height={800}
-                    className="w-full h-full object-contain"
-                  />
+                  {currentImageIndex === -1 && hasVideo && videoInfo.url ? (
+                    <VideoPlayer
+                      videoUrl={videoInfo.url}
+                      autoplay={shouldAutoPlayVideo}
+                      posterImage={videoInfo.posterImage}
+                    />
+                  ) : (
+                    <Image
+                      src={images[currentImageIndex]?.src}
+                      alt="Product"
+                      width={800}
+                      height={800}
+                      className="w-full h-full object-contain"
+                    />
+                  )}
                 </motion.div>
               </AnimatePresence>
               <button
@@ -152,6 +181,33 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
             </div>
             <div className="w-full overflow-x-auto py-2 scrollbar-hide -mx-1">
               <div className="flex gap-3 px-1">
+                {/* Video Thumbnail - if video exists */}
+                {hasVideo && videoInfo.url && (
+                  <div
+                    className={`relative flex-shrink-0 w-20 h-20 rounded-md cursor-pointer transition-all duration-200 ${
+                      currentImageIndex === -1
+                        ? "border-2 border-primary ring-2 ring-primary/20 scale-105"
+                        : "border-2 border-gray-200 hover:border-gray-300"
+                    }`}
+                    onClick={() => handleThumbnailClick(-1)}
+                  >
+                    <div className="absolute inset-0 bg-black/60 rounded-md flex items-center justify-center z-10">
+                      <FaPlay className="text-white text-2xl" />
+                    </div>
+                    {/* Use poster image if available, otherwise use first product image */}
+                    {(videoInfo.posterImage || images[0]) && (
+                      <Image
+                        src={videoInfo.posterImage || images[0].src}
+                        width={120}
+                        height={120}
+                        alt="Video thumbnail"
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                    )}
+                  </div>
+                )}
+
+                {/* Image Thumbnails */}
                 {images.map((image, index) => (
                   <Image
                     key={image.id || index}

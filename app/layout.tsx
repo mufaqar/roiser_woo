@@ -7,7 +7,6 @@ import CartProvider from "@/providers/CartProvider";
 import { Toaster } from "@/components/ui/sonner";
 import WishlistProvider from "@/providers/WishlistProvider";
 
-// Import Jost font
 const jost = Jost({
   variable: "--font-jost",
   subsets: ["latin"],
