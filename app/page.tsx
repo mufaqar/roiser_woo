@@ -8,9 +8,8 @@ import Hero from "@/components/Home/Hero";
 import OnlineFurnitureSeller from "@/components/Home/OnlineFurnitureSeller";
 import OurLatestCollection from "@/components/Home/OurLatestCollection";
 import SellingCollection from "@/components/Home/SellingCollection";
-import { getAllCategories, getAllProducts } from "@/lib/woocommerce-api";
+import { getAllProducts } from "@/lib/woocommerce";
 import { wooApi } from "@/lib/woocommerce";
-import { CatParams, WooCategory } from "@/lib/woocommerce-types";
 
 export async function getParentCategories(): Promise<WooCategory[]> {
   try {

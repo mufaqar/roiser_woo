@@ -1,70 +1,60 @@
 "use client";
-import Link from "next/link";
-import React, { useState } from "react";
+
+import React from "react";
 import SideBar from "@/components/CartPage/SideBar";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
+import useCart from "@/hooks/useCart";
+import Image from "next/image";
+import Link from "next/link";
+import { formatCurrency } from "@/config/currency";
+import { FREE_SHIPPING_THRESHOLD } from '@/config/shoppingCart';
 
 function ShoppingCart() {
+    const { items, removeItemFromCart, updateItemQuantity, cartTotal : subtotal } = useCart();
     const getDelay = useAutoDelay();
-    // Control how many cards you want to show (e.g., 3 or 5)
-    const cardLimit = 2;
 
-    const [products, setProducts] = useState([
-        {
-            id: 1,
-            name: "Chinese Loko Bag",
-            price: 550.0,
-            originalPrice: 790.0,
-            quantity: 1,
-            image: "/images/card-img.png",
-        },
-        {
-            id: 2,
-            name: "Modern Elegant Bag",
-            price: 550.0,
-            originalPrice: 790.0,
-            quantity: 1,
-            image: "/images/card-img.png",
-        },
-        {
-            id: 3,
-            name: "Classic Leather Tote",
-            price: 620.0,
-            originalPrice: 850.0,
-            quantity: 1,
-            image: "/images/card-img.png",
-        },
-        {
-            id: 4,
-            name: "Travel Duffel Bag",
-            price: 480.0,
-            originalPrice: 690.0,
-            quantity: 1,
-            image: "/images/card-img.png",
-        },
-    ]);
+    const handleRemoveProduct = (id: number) => {
+        removeItemFromCart(id);
+    };
 
-    // ✅ only show limited cards
-    const visibleProducts = products.slice(0, cardLimit);
+    const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
-    const updateQuantity = (id: any, newQuantity: any) => {
-        setProducts((prev) =>
-            prev.map((p) =>
-                p.id === id ? { ...p, quantity: Math.max(1, newQuantity) } : p
-            )
+    // Empty state
+    if (items.length === 0) {
+        return (
+            <div className="container mx-auto p-4 md:p-8 min-h-screen flex items-center justify-center">
+                <AnimateOnScroll type="fade-up" delay={getDelay()}>
+                    <div className="text-center py-16">
+                        <div className="mb-6">
+                            <svg
+                                className="mx-auto h-24 w-24 text-gray-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={1.5}
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                                />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-title mb-2">Your cart is empty</h2>
+                        <p className="text-description mb-6">
+                            Looks like you haven't added any items to your cart yet.
+                        </p>
+                        <Link
+                            href="/"
+                            className="inline-block px-6 py-3 bg-primary text-white font-semibold rounded-md hover:bg-primary/90 transition-all duration-300"
+                        >
+                            Continue Shopping
+                        </Link>
+                    </div>
+                </AnimateOnScroll>
+            </div>
         );
-    };
-
-    const removeProduct = (id: any) => {
-        setProducts((prev) => prev.filter((p) => p.id !== id));
-    };
-
-    const calculateSubtotal = () =>
-        products.reduce((sum, p) => sum + p.price * p.quantity, 0);
-
-    const subtotal = calculateSubtotal();
-    const freeShippingThreshold = 59.69;
-    const remainingForFreeShipping = freeShippingThreshold - subtotal;
+    }
 
     return (
         <div className="container mx-auto p-4 md:p-8 min-h-screen flex items-start justify-center">
@@ -78,7 +68,7 @@ function ShoppingCart() {
                                 <p className="text-sm text-description mb-2">
                                     Add{" "}
                                     <span className="font-semibold">
-                                        ${remainingForFreeShipping.toFixed(2)}
+                                        {formatCurrency(remainingForFreeShipping)}
                                     </span>{" "}
                                     to cart and get free shipping
                                 </p>
@@ -93,8 +83,8 @@ function ShoppingCart() {
                                     className="bg-title h-2.5 rounded-full"
                                     style={{
                                         width: `${Math.min(
-                                            70,
-                                            (subtotal / freeShippingThreshold) * 100
+                                            100,
+                                            (subtotal / FREE_SHIPPING_THRESHOLD) * 100
                                         )}%`,
                                     }}
                                 ></div>
@@ -123,11 +113,11 @@ function ShoppingCart() {
                                 </thead>
 
                                 <tbody className="divide-y divide-gray-200">
-                                    {visibleProducts.map((product) => (
+                                    {items.map((product) => (
                                         <tr key={product.id}>
                                             <td className="px-1 py-4">
                                                 <button
-                                                    onClick={() => removeProduct(product.id)}
+                                                    onClick={() => handleRemoveProduct(product.id)}
                                                     className="text-title hover:text-red-600 transition-colors"
                                                 >
                                                     &times;
@@ -135,10 +125,12 @@ function ShoppingCart() {
                                             </td>
 
                                             <td className="px-6 py-4 flex items-center">
-                                                <img
+                                                <Image
                                                     src={product.image}
-                                                    alt={product.name}
+                                                    alt={product.name || `Product ${product.id}`}
                                                     className="h-10 w-10 mr-4 rounded-md"
+                                                    width={40}
+                                                    height={40}
                                                 />
                                                 <span className="text-sm font-medium text-title">
                                                     {product.name}
@@ -147,11 +139,13 @@ function ShoppingCart() {
 
                                             <td className="px-6 py-4 text-sm">
                                                 <span className="font-semibold">
-                                                    ${product.price.toFixed(2)}
+                                                    {formatCurrency(product.price)}
                                                 </span>{" "}
-                                                <span className="line-through text-title text-xs">
-                                                    ${product.originalPrice.toFixed(2)}
-                                                </span>
+                                                {product.originalPrice && (
+                                                    <span className="line-through text-title text-xs">
+                                                        {formatCurrency(product.originalPrice)}
+                                                    </span>
+                                                )}
                                             </td>
 
                                             <td className="px-6 py-4 text-sm">
@@ -160,7 +154,7 @@ function ShoppingCart() {
                                                         type="number"
                                                         value={product.quantity}
                                                         onChange={(e) =>
-                                                            updateQuantity(product.id, parseInt(e.target.value))
+                                                            updateItemQuantity(product.id, parseInt(e.target.value))
                                                         }
                                                         className="w-16 text-center appearance-none outline-none bg-transparent"
                                                         min="1"
@@ -168,7 +162,7 @@ function ShoppingCart() {
                                                     <div className="flex flex-col">
                                                         <button
                                                             onClick={() =>
-                                                                updateQuantity(product.id, product.quantity + 1)
+                                                                updateItemQuantity(product.id, product.quantity + 1)
                                                             }
                                                             className="text-title text-xs px-1"
                                                         >
@@ -176,7 +170,7 @@ function ShoppingCart() {
                                                         </button>
                                                         <button
                                                             onClick={() =>
-                                                                updateQuantity(product.id, product.quantity - 1)
+                                                                updateItemQuantity(product.id, product.quantity - 1)
                                                             }
                                                             className="text-title text-xs px-1"
                                                         >
@@ -187,7 +181,7 @@ function ShoppingCart() {
                                             </td>
 
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                                                ${(product.price * product.quantity).toFixed(2)}
+                                                {formatCurrency(product.price * product.quantity)}
                                             </td>
                                         </tr>
                                     ))}
@@ -206,15 +200,12 @@ function ShoppingCart() {
                                         APPLY COUPON
                                     </button>
                                 </div>
-                                <button className="px-6 py-3 bg-[#2F4761] text-sm text-white font-semibold rounded-md hover:bg-[#1E344B] w-full md:w-auto">
-                                    UPDATE CART
-                                </button>
                             </div>
                         </div>
                     </div>
 
                     {/* RIGHT SECTION - Sidebar */}
-                    <SideBar subtotal={subtotal} />
+                    <SideBar />
                 </div>
             </AnimateOnScroll>
         </div>

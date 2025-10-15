@@ -3,11 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import TopBar from "./TopBars";
+import useCart from "@/hooks/useCart";
+import { formatCurrency } from "@/config/currency";
+import CartDropdown from "./CartDropdown";
+import { useRouter } from "next/navigation";
 
 
 function Header() {
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const { cartTotal, realItemsQuantity, isOpen, setIsOpen } = useCart();
   // ✅ Array of navigation links
   const navLinks = [
     { name: "HOME", href: "/" },
@@ -29,15 +34,15 @@ function Header() {
           {/* Logo + Mobile Menu */}
           <div className="flex items-center justify-between w-full lg:w-auto mb-4 lg:mb-0">
             <div className="flex items-center justify-center lg:justify-start w-full lg:w-auto">
-             <Link href={"/"}>
-              <Image
-                src="/images/logo.png"
-                width={160}
-                height={50}
-                alt="Website Logo"
-                className="h-8 w-auto md:h-8 lg:h-8"
-              />
-             </Link>
+              <Link href={"/"}>
+                <Image
+                  src="/images/logo.png"
+                  width={160}
+                  height={50}
+                  alt="Website Logo"
+                  className="h-8 w-auto md:h-8 lg:h-8"
+                />
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -114,26 +119,31 @@ function Header() {
 
             {/* Wishlist */}
             <button className="p-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors ">
-              <svg
-                className="w-5 h-5 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                ></path>
-              </svg>
+              <Link href="/wishlist">
+                <svg
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                  >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    ></path>
+                </svg>
+              </Link>
             </button>
 
             {/* Cart */}
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <button className="p-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors">
+                <button
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="p-3 border border-gray-300 rounded-full hover:bg-gray-100 transition-colors"
+                >
                   <svg
                     className="w-5 h-5 text-gray-600"
                     fill="none"
@@ -150,13 +160,15 @@ function Header() {
                   </svg>
                 </button>
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                  0
+                  {realItemsQuantity}
                 </span>
+
+                <CartDropdown isOpen={isOpen} onClose={() => setIsOpen(false)} />
               </div>
               <div className="hidden sm:block text-center lg:text-left">
                 <span className="block text-xs text-gray-500">Your cart</span>
                 <span className="block text-sm font-semibold text-gray-900">
-                  $1280.00
+                  {formatCurrency(cartTotal)}
                 </span>
               </div>
             </div>
