@@ -3,7 +3,7 @@ import ProductGrid from "@/components/ShopGrid/ProductGrid";
 import {
   getCategoryBySlug,
   getProductsByCategory,
-} from "@/lib/woocommerce-api";
+} from "@/lib/woocommerce";
 
 export default async function CategoryPage({
   params,
