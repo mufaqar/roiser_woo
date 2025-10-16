@@ -285,7 +285,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
             onClick={handleAddToCart}
             className="w-full bg-[#12213b] text-white py-2.5 px-4 rounded-md hover:bg-[#12213b]/90 transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
           >
-            <FaShoppingCart />
             Add to Cart
           </button>
         </div>

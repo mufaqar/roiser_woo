@@ -20,6 +20,7 @@ export async function getParentCategories(): Promise<WooCategory[]> {
     };
 
     const { data } = await wooApi.get<WooCategory[]>("products/categories", params);
+    console.log("categories", data.map((category) => category.name).join(", "));
     return data;
   } catch (error: any) {
     console.error(
