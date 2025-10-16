@@ -278,7 +278,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
             className="w-full bg-white text-[#12213b] border border-[#12213b] py-2.5 px-4 rounded-md hover:bg-[#12213b] hover:text-white transition-all duration-300 flex items-center justify-center gap-2 font-medium active:scale-95"
           >
             <Link href={`/product/${item.slug}`}>
-              <FaSearch />
               View Product
             </Link>
           </button>
