@@ -3,7 +3,7 @@ import { wooApi } from "./index";
 /**
  * Fetch all products
  */
-export async function getAllProducts(perPage = 20): Promise<WooProduct[]> {
+export async function getAllProducts(perPage = 100): Promise<WooProduct[]> {
   try {
     const { data } = await wooApi.get("products", { per_page: perPage });
     return data;
