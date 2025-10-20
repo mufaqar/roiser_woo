@@ -25,13 +25,11 @@ interface TrendingProductsProps {
 
 const ProductInfo = ({ product }: TrendingProductsProps) => {
   const getDelay = useAutoDelay();
-
   const images = product.images;
-  console.log("Product in ProductPage:", images);
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [[activeIndex, direction], setActiveIndex] = useState([0, 0]);
+  console.log("Produc:", product);
 
   const handleThumbnailClick = (index: number) => {
     const newDirection = index > activeIndex ? 1 : -1;
@@ -67,28 +65,32 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
 
           <div className="w-full lg:w-1/2 p-4 lg:p-8 flex flex-col">
             <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-lg bg-gray-50">
-              <AnimatePresence initial={false} mode="popLayout" custom={direction}>
+              <AnimatePresence
+                initial={false}
+                mode="popLayout"
+                custom={direction}
+              >
                 <motion.div
                   key={currentImageIndex}
                   custom={direction}
                   variants={{
                     enter: (direction: number) => ({
-                      x: direction > 0 ? '100%' : '-100%',
-                      opacity: 0
+                      x: direction > 0 ? "100%" : "-100%",
+                      opacity: 0,
                     }),
                     center: {
                       x: 0,
-                      opacity: 1
+                      opacity: 1,
                     },
                     exit: (direction: number) => ({
-                      x: direction > 0 ? '-100%' : '100%',
-                      opacity: 0
-                    })
+                      x: direction > 0 ? "-100%" : "100%",
+                      opacity: 0,
+                    }),
                   }}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
+                  transition={{ duration: 0.4, ease: "easeInOut" }}
                   className="absolute inset-0"
                 >
                   <Image
@@ -104,16 +106,36 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                 onClick={handlePrevImage}
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 text-gray-700 z-10"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
               <button
                 onClick={handleNextImage}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full w-10 h-10 flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-200 text-gray-700 z-10"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
               <span className="absolute top-4 left-4 bg-red-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md shadow-lg z-10">
@@ -146,9 +168,18 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
           <div className="w-full lg:w-1/2 p-8 lg:p-12">
             <div className="flex justify-between items-center mb-4">
               <div>
-                <p className="text-description text-sm">MODERN DRESS</p>
+                <p className="text-description text-sm">
+                  <p className="text-description text-sm">
+                    {product.categories.map((cat, index) => (
+                      <span key={cat.id}>
+                        {cat.name}
+                        {index < product.categories.length - 1 && ", "}
+                      </span>
+                    ))}
+                  </p>
+                </p>
                 <h1 className="text-3xl font-bold text-gray-800">
-              {product.name}
+                  {product.name}
                 </h1>
               </div>
               <FaRegStar className="text-description text-2xl cursor-pointer hover:text-description" />
@@ -163,7 +194,7 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                 <FaRegStar />
               </div>
               <span className="text-description text-sm">
-                (1 customer review)
+                ( {product.rating_count} customer review)
               </span>
             </div>
 
@@ -172,15 +203,14 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                 ${product.price}
               </span>
               <span className="text-description line-through text-lg">
-               ${product.regular_price}
+                ${product.regular_price}
               </span>
             </div>
 
-          
-             <div
-            className="text-description leading-relaxed mb-6"
-            dangerouslySetInnerHTML={{ __html: product.short_description }}
-          ></div>
+            <div
+              className="text-description leading-relaxed mb-6"
+              dangerouslySetInnerHTML={{ __html: product.short_description }}
+            ></div>
 
             <p className="text-description flex items-center mb-6">
               <span className="w-3 h-3 bg-description rounded-full mr-2 animate-pulse"></span>
@@ -220,7 +250,11 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
                   className="p-3 border-r border-gray-300 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-all duration-150 active:scale-95"
                   disabled={quantity === 1}
                 >
-                  <FaMinus className={`transition-opacity ${quantity === 1 ? 'opacity-30' : 'opacity-100'}`} />
+                  <FaMinus
+                    className={`transition-opacity ${
+                      quantity === 1 ? "opacity-30" : "opacity-100"
+                    }`}
+                  />
                 </button>
                 <span className="px-6 py-3 text-lg font-semibold text-gray-800 min-w-[60px] text-center transition-all duration-200">
                   {quantity}

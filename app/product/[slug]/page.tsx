@@ -6,7 +6,7 @@ import Delivery from "@/components/Delivery";
 import RecommendedProducts from "@/components/ProductPage/RecommendedProducts";
 import ProductDetail from "@/components/ProductPage/ProductDetail";
 import DeliveryInformation from "@/components/ProductPage/DeliveryInformation";
-import { getProductBySlug, getRelatedProducts } from "@/lib/woocommerce-api";
+import { getProductBySlug, getProductReviewsById, getRelatedProducts } from "@/lib/woocommerce-api";
 import ProductInfo from "@/components/ProductPage/ProductInfo";
 
 
@@ -18,15 +18,16 @@ import ProductInfo from "@/components/ProductPage/ProductInfo";
    
   const categoryIds = product.categories?.map((cat: any) => cat.id) || [];
   const relatedProducts = await getRelatedProducts(categoryIds, product.id);
+   const reviews = await getProductReviewsById(product.id);
   return (
     <>
       <Banner title={product.name} breadcrumb={product.name}  />
       <Delivery />
       <ProductInfo product={product} />
       <RecommendedProducts products={relatedProducts} />
-      <ProductDetail />
+      <ProductDetail product={product}/>
       <DeliveryInformation />
-      <CustomerTestimonials />
+      <CustomerTestimonials reviews={reviews} />
       <News />
       <DailyUpdate />
     </>

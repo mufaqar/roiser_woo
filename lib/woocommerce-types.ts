@@ -65,8 +65,18 @@ export interface WooProduct {
   stock_status: "instock" | "outofstock" | "onbackorder";
   has_options?: boolean;
   _links?: WooLinks;
-  expressDelivery?: string;
-  paymentPlan?: string;
+  acf?: WooACF;
+  options: Options;
+}
+
+/** Woo ACF Fields */
+export interface WooACF {
+  product_type?: string; // e.g. "Decking" or "Fence"
+  product_color?: string;
+  product_material?: string;
+  product_gallery?: WooImage[];
+  custom_price_label?: string;
+  [key: string]: any; // fallback for untyped ACF fields
 }
 
 /**
@@ -90,14 +100,7 @@ export interface WooCategory {
   display: string;
   image: WooImage | null;
   menu_order: number;
-  count: number;  
-}
-
-// ✅ Type used for sending params in your API request
-export interface CatParams {
-  parent?: number;
-  hide_empty?: boolean;
-  per_page?: number;
+  count: number;
 }
 
 /**
@@ -161,4 +164,43 @@ export interface WooLinks {
 
 export interface WooLink {
   href: string;
+}
+
+export interface Options {
+  length: number;
+  boards: number;
+  area?: number;
+}
+
+export interface WooReview {
+ id: number;
+  date_created: string;
+  date_created_gmt: string;
+  product_id: number;
+  product:number;
+  reviewer: string;
+  reviewer_email: string;
+  review: string;
+  rating: number;
+  verified: boolean;
+  reviewer_avatar_urls: {
+    [size: string]: string;
+  };
+}
+
+
+export interface WooVariation {
+  id: number;
+  name: string;
+  regular_price: string;
+  sale_price: string;
+  price: string;
+  stock_status: 'instock' | 'outofstock' | 'onbackorder';
+  in_stock: boolean;
+  sku: string;
+  attributes: Array<{
+    name: string;
+    option: string;
+  }>;
+  images: WooImage[];
 }

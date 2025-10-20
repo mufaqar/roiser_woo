@@ -1,5 +1,5 @@
 import { wooApi } from "./woocommerce";
-import { WooProduct } from "./woocommerce-types";
+import { WooProduct, WooReview } from "./woocommerce-types";
 
 
 /**
@@ -97,4 +97,35 @@ export async function getFeaturedProducts(per_page: number = 8) {
     per_page,
   });
   return data;
+}
+
+
+export async function getProductReviewsById(productId: number, limit = 10): Promise<WooReview[]> {
+  if (!productId) return [];
+
+  try {
+    const { data } = await wooApi.get<WooReview[]>(
+      `products/reviews?product=${productId}&per_page=${limit}&orderby=date&order=desc`
+    );
+
+    return Array.isArray(data) ? data : [];
+  } catch (error: any) {
+    console.error(`Error fetching reviews for product ID ${productId}:`, error.response?.data || error.message);
+    return [];
+  }
+}
+
+export async function getAllProductReviews(limit = 10): Promise<WooReview[]> {
+  try {
+    const { data } = await wooApi.get<WooReview[]>("products/reviews", {
+      per_page: limit,
+      orderby: "date",
+      order: "desc",
+    });
+
+    return Array.isArray(data) ? data : [];
+  } catch (error: any) {
+    console.error("Error fetching all product reviews:", error.response?.data || error.message);
+    return [];
+  }
 }
