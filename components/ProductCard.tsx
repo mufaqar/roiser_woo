@@ -232,7 +232,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
 
         {/* Name */}
         <Link href={`/product/${item.slug}`} className="mb-2">
-          <h3 className="text-3xl font-normal text-title line-clamp-2 hover:text-primary transition-colors">
+          <h3 className="text-3xl font-normal text-title line-clamp-2 hover:text-primary transition-colors min-h-[4.5rem]">
             {item.name}
           </h3>
         </Link>
