@@ -18,7 +18,6 @@ export const readToken = (res: Response, existing?: string) => res.headers.get("
 
 export async function getWooCart(token?: string) {
     try {
-        console.log('Fetching WooCommerce cart via API route');
         const res = await fetch(API_BASE_URL, {
             method: 'GET',
             headers: {

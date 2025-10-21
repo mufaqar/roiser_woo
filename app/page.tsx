@@ -8,8 +8,10 @@ import Hero from "@/components/Home/Hero";
 import OnlineFurnitureSeller from "@/components/Home/OnlineFurnitureSeller";
 import OurLatestCollection from "@/components/Home/OurLatestCollection";
 import SellingCollection from "@/components/Home/SellingCollection";
-import { getAllProducts } from "@/lib/woocommerce";
+import { getAllProductsCached } from "@/lib/woocommerce";
 import { wooApi } from "@/lib/woocommerce";
+
+export const revalidate = 3600; // Cache for 1 hour
 
 export async function getParentCategories(): Promise<WooCategory[]> {
   try {
@@ -20,7 +22,6 @@ export async function getParentCategories(): Promise<WooCategory[]> {
     };
 
     const { data } = await wooApi.get<WooCategory[]>("products/categories", params);
-    console.log("categories", data.map((category) => category.name).join(", "));
     return data;
   } catch (error: any) {
     console.error(
@@ -33,8 +34,12 @@ export async function getParentCategories(): Promise<WooCategory[]> {
 
 
 export default async function Home() {
-  const products = await getAllProducts();
-  const categories = await getParentCategories();
+  const [products, categories] = await Promise.all([
+    getAllProductsCached(),
+    getParentCategories()
+  ]);
+
+  console.log("products", products.length);
 
   return (
     <>

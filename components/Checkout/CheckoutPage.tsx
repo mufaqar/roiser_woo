@@ -49,8 +49,6 @@ function CheckoutPage() {
   const agreeToTerms = watch('agreeToTerms');
 
   const onSubmit = (data: CheckoutFormData) => {
-    console.log('Checkout data:', data);
-    console.log('Cart items:', items);
     // TODO: Implement order submission logic
     router.push('/');
   };

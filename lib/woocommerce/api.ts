@@ -1,11 +1,20 @@
+import { cache } from "react";
 import { wooApi } from "./index";
+
+/**
+ * Fetch all products and cache the result
+ */
+export const getAllProductsCached = cache(async () : Promise<WooProduct[]> => {
+  const { data } = await wooApi.get("products", { per_page: 100 });
+  return data;
+});
 
 /**
  * Fetch all products
  */
-export async function getAllProducts(perPage = 100): Promise<WooProduct[]> {
+export async function getAllProducts(): Promise<WooProduct[]> {
   try {
-    const { data } = await wooApi.get("products", { per_page: perPage });
+    const { data } = await wooApi.get("products", { per_page: 100 });
     return data;
   } catch (error: any) {
     console.error("Error fetching products:", error.response?.data || error.message);

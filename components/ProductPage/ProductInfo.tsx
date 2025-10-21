@@ -228,7 +228,7 @@ const ProductInfo = ({ product }: TrendingProductsProps) => {
           </div>
 
           {/* Product Details */}
-
+          
           <div className="w-full lg:w-1/2 p-8 lg:p-12">
             <div className="flex justify-between items-center mb-4">
               <div>

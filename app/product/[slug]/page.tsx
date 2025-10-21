@@ -8,7 +8,11 @@ import ProductDetail from "@/components/ProductPage/ProductDetail";
 import DeliveryInformation from "@/components/ProductPage/DeliveryInformation";
 import { getProductBySlug, getRelatedProducts } from "@/lib/woocommerce";
 import ProductInfo from "@/components/ProductPage/ProductInfo";
+import ProductInfoV2 from "@/components/ProductPage/ProductInfo_NEW";
+import ProductInfoPicker from "./product-info";
 
+export const revalidate = 3600;
+export const dynamicParams = true;
 
 export default async function SingleProduct({ params }: { params: { slug: string } }) {
   const { slug } = await params
@@ -19,12 +23,13 @@ export default async function SingleProduct({ params }: { params: { slug: string
   }
 
   const categoryIds = product.categories?.map((cat: any) => cat.id) || [];
-  const relatedProducts = await getRelatedProducts(categoryIds, product.id);
+  const relatedProducts = await getRelatedProducts(categoryIds, product.id)
+
   return (
     <>
       <Banner breadcrumb={product.name}  />
       <Delivery />
-      <ProductInfo product={product} />
+      <ProductInfoPicker product={product} />
       <RecommendedProducts products={relatedProducts} />
       <ProductDetail />
       <DeliveryInformation />

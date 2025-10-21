@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
-import { FaTruck, FaHeart, FaRegHeart, FaShoppingCart, FaSearch, FaYoutube, FaPlay } from "react-icons/fa";
+import { FaTruck, FaHeart, FaRegHeart, FaPlay } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -14,9 +14,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
-  console.log(JSON.stringify(item, null, 2));
-
-  // State for image carousel (must be before any returns)
   const [[currentImageIndex, direction], setImageState] = useState([0, 0]);
   const { addItemToCart } = useCart();
   const { toggleItemInWishlist, isInWishlist } = useWishlist();
