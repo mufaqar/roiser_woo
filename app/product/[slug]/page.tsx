@@ -11,7 +11,7 @@ import ProductInfo from "@/components/ProductPage/ProductInfo";
 import ProductInfoV2 from "@/components/ProductPage/ProductInfo_NEW";
 import ProductInfoPicker from "./product-info";
 
-export const revalidate = 3600;
+export const revalidate = 60;
 export const dynamicParams = true;
 
 export default async function SingleProduct({ params }: { params: { slug: string } }) {

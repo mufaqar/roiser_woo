@@ -11,7 +11,7 @@ import SellingCollection from "@/components/Home/SellingCollection";
 import { getAllProductsCached } from "@/lib/woocommerce";
 import { wooApi } from "@/lib/woocommerce";
 
-export const revalidate = 3600; // Cache for 1 hour
+export const revalidate = 60; // Cache for 1 minute
 
 export async function getParentCategories(): Promise<WooCategory[]> {
   try {
