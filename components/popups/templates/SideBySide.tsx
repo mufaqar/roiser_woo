@@ -13,7 +13,11 @@ interface SideBySideProps {
   onCTAClick: () => void;
 }
 
-export default function SideBySide({ popup, onClose, onCTAClick }: SideBySideProps) {
+export default function SideBySide({
+  popup,
+  onClose,
+  onCTAClick,
+}: SideBySideProps) {
   const { content, animation } = popup;
 
   // Animation variants
@@ -80,13 +84,19 @@ export default function SideBySide({ popup, onClose, onCTAClick }: SideBySidePro
           <div className="grid md:grid-cols-2 grid-cols-1">
             {/* Image Side */}
             <div className="relative h-80 md:h-auto">
-              <Image
-                src={content.imageUrl}
-                alt={content.imageAlt || "Popup image"}
-                fill
-                className="object-cover"
-                unoptimized
-              />
+              {content.imageUrl ? (
+                <Image
+                  src={content.imageUrl}
+                  alt={content.imageAlt || "Popup image"}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              ) : (
+                <div className="bg-gray-100 w-full h-full flex items-center justify-center text-gray-400">
+                  No image
+                </div>
+              )}
             </div>
 
             {/* Content Side */}

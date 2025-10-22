@@ -5,6 +5,7 @@ import { CiMenuFries } from "react-icons/ci";
 import { RxCross2 } from "react-icons/rx";
 
 import ProductCard from "../ProductCard";
+import { WooProduct } from "@/types/woocommerce";
 
 interface ProductCollectionProps {
   cat: WooCategory[];

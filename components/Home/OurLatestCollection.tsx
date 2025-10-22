@@ -7,6 +7,8 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import AnimateOnScroll, { useAutoDelay } from "../Animation";
 import ProductCard from "../ProductCard";
+import { WooProduct } from "@/types/woocommerce";
+
 
 interface ProductCollectionProps {
   cat: WooCategory[];

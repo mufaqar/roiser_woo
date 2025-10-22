@@ -2,6 +2,8 @@
  * Helper functions to extract video information from WooCommerce product meta_data
  */
 
+import { WooProduct } from "@/types/woocommerce";
+
 export interface ProductVideoInfo {
   source: 'local' | 'youtube' | 'vimeo' | null;
   url: string | null;

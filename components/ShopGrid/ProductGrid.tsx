@@ -1,5 +1,6 @@
 "use client";
 
+import { WooProduct } from "@/types/woocommerce";
 import ProductCard from "../ProductCard";
 
 interface ProductGridProps {

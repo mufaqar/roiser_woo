@@ -8,6 +8,7 @@ import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
 import useCart from "@/hooks/useCart";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { WooProduct } from "@/types/woocommerce";
 
 
 interface TrendingProductsProps {

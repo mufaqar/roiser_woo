@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { wooApi } from "./index";
+import { WooProduct } from "@/types/woocommerce";
 
 /**
  * Fetch all products and cache the result

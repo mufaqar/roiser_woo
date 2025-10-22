@@ -25,6 +25,7 @@ import { formatCurrency } from "@/config/currency";
 import { useWishlist } from "@/hooks/useWishlist";
 import VideoPlayer from "../VideoPlayer";
 import { getProductVideo } from "@/lib/woocommerce/video-helpers";
+import { WooProduct } from "@/types/woocommerce";
 
 interface TrendingProductsProps {
   product: WooProduct;

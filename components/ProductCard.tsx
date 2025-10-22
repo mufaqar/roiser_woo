@@ -8,6 +8,7 @@ import { useWishlist } from "@/hooks/useWishlist";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { getProductVideo } from "@/lib/woocommerce/video-helpers";
 import useCart from "@/hooks/useCart";
+import { WooProduct } from "@/types/woocommerce";
 
 interface ProductCardProps {
   item: WooProduct;
