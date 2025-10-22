@@ -6,6 +6,7 @@ import Footer from "@/components/HeaderFooter/Footer";
 import CartProvider from "@/providers/CartProvider";
 import { Toaster } from "@/components/ui/sonner";
 import WishlistProvider from "@/providers/WishlistProvider";
+import PopupManager from "@/components/popups/PopupManager";
 
 const jost = Jost({
   variable: "--font-jost",
@@ -14,7 +15,7 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Roiser - Furniture Store",
+  title: "Vitahomedecor - Furniture Store",
   description: "Your online Furniture Shop",
 };
 
@@ -31,6 +32,7 @@ export default function RootLayout({
             <Header />
             {children}
             <Footer />
+            <PopupManager />
           </WishlistProvider>
         </CartProvider>
         <Toaster richColors theme="light" />

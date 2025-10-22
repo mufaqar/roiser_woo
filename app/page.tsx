@@ -13,15 +13,15 @@ import { wooApi } from "@/lib/woocommerce";
 
 export const revalidate = 60; // Cache for 1 minute
 
-export async function getParentCategories(): Promise<WooCategory[]> {
+export async function getParentCategories(): Promise<any[]> {
   try {
-    const params: CatParams = {
+    const params = {
       per_page: 100,
       parent: 0,
       hide_empty: true,
     };
 
-    const { data } = await wooApi.get<WooCategory[]>("products/categories", params);
+    const { data } = await wooApi.get<any[]>("products/categories", params);
     return data;
   } catch (error: any) {
     console.error(

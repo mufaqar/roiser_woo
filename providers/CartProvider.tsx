@@ -3,7 +3,6 @@
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { SHIPPING_OPTIONS, FREE_SHIPPING_THRESHOLD } from '@/config/shoppingCart'
-import { applyWooCoupon, removeWooCoupon, selectWooShippingRate, syncWooCart, updateWooAddress } from '@/lib/woocommerce'
 
 interface Props {
     children: React.ReactNode;
@@ -36,11 +35,6 @@ interface CartContextType {
     realItemsQuantity: number;
     qualifiesForFreeShipping: boolean;
     amountUntilFreeShipping: number;
-    applyCoupon: (code: string) => void;
-    removeCoupon: (code: string) => void;
-    shippingRates: WooShippingPackage[];
-    selectShippingRate: (pkgId: number, rateId: string) => void;
-    setUKShippingAddress: (addr: { address_1: string; city: string; postcode: string }) => void;
 }
 
 // TODO: get best practice for the undefined
@@ -54,10 +48,6 @@ export default function CartProvider({ children }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [shippingMethod, setShippingMethodState] = useState<ShippingMethod>('flat');
     const [isLoaded, setIsLoaded] = useState(false);
-
-    // WooCommerce Cart state
-    const [wooCartToken, setWooCartToken] = useState<string | undefined>(undefined);
-    const [wooCart, setWooCart] = useState<WooCartResponse | undefined>(undefined);
 
     useEffect(() => {
         try {
@@ -179,68 +169,6 @@ export default function CartProvider({ children }: Props) {
     const grandTotal = useMemo(() => {
         return cartTotal + shippingCost;
     }, [cartTotal, shippingCost]);
-
-    // WooCommerce
-    const syncWooFromLocal = useCallback(async () => {
-        if (!items.length) { setWooCartToken(undefined); setWooCart(undefined); return; }
-        try {
-            const { cart, cartToken } = await syncWooCart({ local: items.map(i => ({ id: i.id, quantity: i.quantity })) });
-            setWooCartToken(cartToken); setWooCart(cart);
-        } catch (error) {
-            console.error('Failed to sync cart with WooCommerce:', error);
-            // Fall back to local cart if WooCommerce sync fails
-        }
-    }, [items, setWooCartToken]);
-
-    const selectShippingRate = useCallback(async (pkgId: number, rateId: string) => {
-        if (!wooCartToken) return;
-        try {
-            const cart = await selectWooShippingRate(wooCartToken, pkgId, rateId);
-            setWooCart(cart);
-        } catch (error) {
-            console.error('Failed to select shipping rate:', error);
-        }
-    }, [wooCartToken]);
-
-    const applyCoupon = useCallback(async (code: string) => {
-        try {
-            if (!wooCartToken) await syncWooFromLocal();
-            const cart = await applyWooCoupon(wooCartToken!, code);
-            setWooCart(cart);
-            toast.success('Coupon applied', { description: code.toUpperCase() });
-        } catch (error) {
-            console.error('Failed to apply coupon:', error);
-            toast.error('Failed to apply coupon', { description: 'Please try again' });
-        }
-    }, [wooCartToken, syncWooFromLocal]);
-
-    const removeCoupon = useCallback(async (code: string) => {
-        if (!wooCartToken) return;
-        try {
-            const cart = await removeWooCoupon(wooCartToken, code);
-            setWooCart(cart);
-            toast.info('Coupon removed', { description: code.toUpperCase() });
-        } catch (error) {
-            console.error('Failed to remove coupon:', error);
-            toast.error('Failed to remove coupon', { description: 'Please try again' });
-        }
-    }, [wooCartToken]);
-    const setUKShippingAddress = useCallback(async (addr: { address_1: string; city: string; postcode: string }) => {
-        if (!wooCartToken) await syncWooFromLocal();
-        try {
-            const cart = await updateWooAddress(wooCartToken!, addr);
-            setWooCart(cart);
-        } catch (error) {
-            console.error('Failed to update shipping address:', error);
-            toast.error('Failed to update shipping address', { description: 'Please try again' });
-        }
-    }, [wooCartToken, syncWooFromLocal]);
-
-     // Sync WooCommerce cart from local
-    useEffect(() => {
-        const t = setTimeout(() => { if (isLoaded) syncWooFromLocal(); }, 250);
-        return () => clearTimeout(t);
-    }, [items, isLoaded, syncWooFromLocal]);
     
     return (
         <CartContext.Provider value={{
@@ -258,12 +186,7 @@ export default function CartProvider({ children }: Props) {
             shippingCost,
             grandTotal,
             qualifiesForFreeShipping,
-            amountUntilFreeShipping,
-            applyCoupon,
-            removeCoupon,
-            shippingRates: wooCart?.shipping_rates ?? [],
-            selectShippingRate,
-            setUKShippingAddress
+            amountUntilFreeShipping
         }}>
             {children}
         </CartContext.Provider>

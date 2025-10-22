@@ -35,7 +35,7 @@ function FlatSale() {
                 <p className="text-sm uppercase tracking-wider">UNIQUE OFFICE TABLE</p>
                 <p className="text-4xl font-bold my-2">30% Flat Sale</p>
                 <p className="text-sm font-[300] pb-8">Online Promo Code: <span className="font-bold">7QHQT</span></p>
-                <Link href='' className=" px-6 py-3 bg-white text-description font-semibold rounded-md  transition duration-300">
+                <Link href='/' className="mt-6 px-6 py-3 bg-white text-gray-900 font-semibold rounded-md  transition duration-300">
                   START SHOPPING
                 </Link>
               </div>
@@ -51,10 +51,12 @@ function FlatSale() {
           <AnimateOnScroll type="fade-up" delay={getDelay()}>
 
             <div className="relative w-full  bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-              <img
+              <Image
                 src="/images/flat-image-1.jpg"
                 alt="Elegant Comfort Chair"
                 className="w-full h-80 object-cover"
+                width={500}
+                height={500}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent opacity-80"></div>
               <div className="absolute top-8 left-8 text-white">

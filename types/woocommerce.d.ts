@@ -81,24 +81,28 @@ interface WooDimensions {
 /**
  * Product Category
  */
-interface WooCategory {
-  id: number;
-  name: string;
-  slug: string;
-  parent: number;
-  description: string;
-  display: string;
-  image: WooImage | null;
-  menu_order: number;
-  count: number;  
+declare global {
+  interface WooCategory {
+    id: number;
+    name: string;
+    slug: string;
+    parent: number;
+    description: string;
+    display: string;
+    image: WooImage | null;
+    menu_order: number;
+    count: number;
+  }
+
+  // ✅ Type used for sending params in your API request
+  interface CatParams {
+    parent?: number;
+    hide_empty?: boolean;
+    per_page?: number;
+  }
 }
 
-// ✅ Type used for sending params in your API request
-interface CatParams {
-  parent?: number;
-  hide_empty?: boolean;
-  per_page?: number;
-}
+export {};
 
 /**
  * Product Image

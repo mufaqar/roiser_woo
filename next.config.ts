@@ -25,6 +25,16 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'woocommerce-1531534-5907618.cloudwaysapps.com',
         pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'postscript-mms-files.s3.amazonaws.com',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.vitahomedecor.co.uk',
+        pathname: '**',
       }
     ],
   },

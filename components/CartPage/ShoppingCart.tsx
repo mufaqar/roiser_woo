@@ -9,13 +9,28 @@ import Link from "next/link";
 import { formatCurrency } from "@/config/currency";
 import { FREE_SHIPPING_THRESHOLD } from '@/config/shoppingCart';
 
+const ITEMS_PER_PAGE = 30;
+
 function ShoppingCart() {
     const { items, removeItemFromCart, updateItemQuantity, cartTotal : subtotal } = useCart();
     const getDelay = useAutoDelay();
+    const [displayCount, setDisplayCount] = React.useState(ITEMS_PER_PAGE);
 
     const handleRemoveProduct = (id: number) => {
         removeItemFromCart(id);
     };
+
+    const handleLoadMore = () => {
+        setDisplayCount(prev => Math.min(prev + ITEMS_PER_PAGE, items.length));
+    };
+
+    const handleShowAll = () => {
+        setDisplayCount(items.length);
+    };
+
+    const displayedItems = items.slice(0, displayCount);
+    const hasMoreItems = displayCount < items.length;
+    const remainingItems = items.length - displayCount;
 
     const remainingForFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD - subtotal);
 
@@ -93,6 +108,14 @@ function ShoppingCart() {
 
                         {/* Product Table */}
                         <div className="overflow-x-auto bg-[#F4F5F7] p-6">
+                            {items.length > ITEMS_PER_PAGE && (
+                                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                    <p className="text-sm text-blue-800">
+                                        <span className="font-semibold">Large cart detected:</span> Showing {displayCount} of {items.length} items for better performance.
+                                    </p>
+                                </div>
+                            )}
+
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
@@ -113,7 +136,7 @@ function ShoppingCart() {
                                 </thead>
 
                                 <tbody className="divide-y divide-gray-200">
-                                    {items.map((product) => (
+                                    {displayedItems.map((product) => (
                                         <tr key={product.id}>
                                             <td className="px-1 py-4">
                                                 <button
@@ -187,6 +210,29 @@ function ShoppingCart() {
                                     ))}
                                 </tbody>
                             </table>
+
+                            {/* Load More Buttons */}
+                            {hasMoreItems && (
+                                <div className="mt-6 flex flex-col items-center gap-3 p-4 bg-white border border-gray-200 rounded-md">
+                                    <p className="text-sm text-gray-600">
+                                        {remainingItems} more {remainingItems === 1 ? 'item' : 'items'} in your cart
+                                    </p>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            className="px-6 py-2 bg-[#2F4761] text-white font-medium rounded-md hover:bg-[#1f3347] transition-colors"
+                                        >
+                                            Load {Math.min(ITEMS_PER_PAGE, remainingItems)} More
+                                        </button>
+                                        <button
+                                            onClick={handleShowAll}
+                                            className="px-6 py-2 bg-white text-[#2F4761] font-medium rounded-md border border-[#2F4761] hover:bg-gray-50 transition-colors"
+                                        >
+                                            Show All ({items.length})
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Coupon + Update Buttons */}
                             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">

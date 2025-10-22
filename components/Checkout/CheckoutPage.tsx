@@ -11,6 +11,8 @@ import { formatCurrency } from '@/config/currency';
 import { checkoutFormSchema, type CheckoutFormData } from '@/schemas/cartSchema';
 import Image from 'next/image';
 
+const ITEMS_PER_PAGE = 30;
+
 function CheckoutPage() {
   const getDelay = useAutoDelay();
   const router = useRouter();
@@ -20,6 +22,13 @@ function CheckoutPage() {
     shippingCost,
     grandTotal,
   } = useCart();
+
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [displayCount, setDisplayCount] = React.useState(ITEMS_PER_PAGE);
+
+  const displayedItems = items.slice(0, displayCount);
+  const hasMoreItems = displayCount < items.length;
+  const remainingItems = items.length - displayCount;
 
   const {
     register,
@@ -48,9 +57,58 @@ function CheckoutPage() {
 
   const agreeToTerms = watch('agreeToTerms');
 
-  const onSubmit = (data: CheckoutFormData) => {
-    // TODO: Implement order submission logic
-    router.push('/');
+  const onSubmit = async (data: CheckoutFormData) => {
+    try {
+      setIsSubmitting(true);
+
+      if (items.length === 0) {
+        alert('Your cart is empty. Please add items before checking out.');
+        router.push('/shop');
+        return;
+      }
+
+      const checkoutData = {
+        billing_address: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          company: data.companyName || '',
+          address_1: data.streetAddress,
+          address_2: data.apartment || '',
+          city: data.townCity,
+          state: data.state || '',
+          postcode: data.zipCode,
+          country: 'GB', // United Kingdom
+          email: data.email,
+          phone: data.phone,
+        },
+        shipping_address: {
+          first_name: data.firstName,
+          last_name: data.lastName,
+          company: data.companyName || '',
+          address_1: data.streetAddress,
+          address_2: data.apartment || '',
+          city: data.townCity,
+          state: data.state || '',
+          postcode: data.zipCode,
+          country: 'GB', // United Kingdom
+        },
+        line_items: items.map(item => ({
+          product_id: item.id,
+          quantity: item.quantity,
+        })),
+        shipping_cost: shippingCost,
+        customer_note: data.orderNotes || '',
+        payment_method: data.paymentMethod,
+      };
+
+      sessionStorage.setItem('pendingOrder', JSON.stringify(checkoutData));
+
+      router.push('/checkout/processing');
+    } catch (error) {
+      console.error('Error preparing checkout:', error);
+      alert('An error occurred while preparing your order. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -247,24 +305,42 @@ function CheckoutPage() {
                       </Link>
                     </div>
                   ) : (
-                    items.map(item => (
-                      <div key={item.id} className="flex justify-between items-center py-3">
-                        <div className="flex items-center space-x-3">
-                          <Image
-                            src={item.image}
-                            alt={item.name || 'Product'}
-                            width={48}
-                            height={48}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                          <div>
-                            <span className="text-sm text-title block">{item.name || 'Product'}</span>
-                            <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
-                          </div>
+                    <>
+                      {items.length > ITEMS_PER_PAGE && (
+                        <div className="mb-3 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-800">
+                          Showing {displayCount} of {items.length} items
                         </div>
-                        <span className="text-sm font-medium text-title">{formatCurrency(item.price * item.quantity)}</span>
-                      </div>
-                    ))
+                      )}
+                      {displayedItems.map(item => (
+                        <div key={item.id} className="flex justify-between items-center py-3">
+                          <div className="flex items-center space-x-3">
+                            <Image
+                              src={item.image}
+                              alt={item.name || 'Product'}
+                              width={48}
+                              height={48}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div>
+                              <span className="text-sm text-title block">{item.name || 'Product'}</span>
+                              <span className="text-xs text-gray-500">Qty: {item.quantity}</span>
+                            </div>
+                          </div>
+                          <span className="text-sm font-medium text-title">{formatCurrency(item.price * item.quantity)}</span>
+                        </div>
+                      ))}
+                      {hasMoreItems && (
+                        <div className="py-3 text-center border-t border-gray-200">
+                          <button
+                            type="button"
+                            onClick={() => setDisplayCount(items.length)}
+                            className="text-sm text-[#2F4761] hover:underline font-medium"
+                          >
+                            + Show {remainingItems} more {remainingItems === 1 ? 'item' : 'items'}
+                          </button>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {/* Subtotal */}
@@ -338,11 +414,21 @@ function CheckoutPage() {
 
                 <button
                   type="submit"
-                  className={`w-full py-3 mt-6 text-white font-semibold rounded-md transition-colors duration-300
-                  ${agreeToTerms && items.length > 0 ? 'bg-[#2F4761] hover:bg-[#1f3347]' : 'bg-gray-400 cursor-not-allowed'}`}
-                  disabled={!agreeToTerms || items.length === 0}
+                  className={`w-full py-3 mt-6 text-white font-semibold rounded-md transition-colors duration-300 flex items-center justify-center gap-2
+                  ${agreeToTerms && items.length > 0 && !isSubmitting ? 'bg-[#2F4761] hover:bg-[#1f3347]' : 'bg-gray-400 cursor-not-allowed'}`}
+                  disabled={!agreeToTerms || items.length === 0 || isSubmitting}
                 >
-                  PLACE ORDER
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>PROCESSING...</span>
+                    </>
+                  ) : (
+                    'PLACE ORDER'
+                  )}
                 </button>
               </div>
             </div>

@@ -6,11 +6,10 @@ import TopBar from "./TopBars";
 import useCart from "@/hooks/useCart";
 import { formatCurrency } from "@/config/currency";
 import CartDropdown from "./CartDropdown";
-import { useRouter } from "next/navigation";
-
+import { usePathname } from "next/navigation";
 
 function Header() {
-  const router = useRouter();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartTotal, realItemsQuantity, isOpen, setIsOpen } = useCart();
   // ✅ Array of navigation links
@@ -23,7 +22,7 @@ function Header() {
     { name: "CONTACT", href: "/contact-us" },
   ];
 
-  return (
+  return pathname.startsWith("/admin") ? null : (
     <header className="text-primary -mb-8 relative z-50">
       {/* Top Bar */}
       <TopBar />

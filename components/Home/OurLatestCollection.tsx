@@ -93,17 +93,19 @@ const OurLatestCollection: React.FC<ProductCollectionProps> = ({
 
         {/* Product Slider */}
         {currentProducts.length > 0 ? (
-          <Slider {...settings}>
-            {currentProducts.map((product) => (
-              <AnimateOnScroll
+          // <div className="gap-x-3">
+            <Slider {...settings}>
+              {currentProducts.map((product) => (
+                <AnimateOnScroll
                 key={product.id}
                 type="fade-up"
                 delay={getDelay()}
-              >
-                <ProductCard item={product} />
-              </AnimateOnScroll>
-            ))}
-          </Slider>
+                >
+                  <ProductCard item={product} />
+                </AnimateOnScroll>
+              ))}
+            </Slider>
+          // </div>
         ) : (
           <p className="text-gray-500 mt-4">
             No products found in this category.

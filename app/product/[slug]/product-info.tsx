@@ -4,7 +4,7 @@ import ProductInfo from "@/components/ProductPage/ProductInfo";
 import ProductInfoV2 from "@/components/ProductPage/ProductInfo_NEW";
 
 interface ProductInfoProps {
-    product: WooProduct;
+    product: any; // WooProduct type from global types
 }
 
 export default function ProductInfoPicker({ product }: ProductInfoProps) {

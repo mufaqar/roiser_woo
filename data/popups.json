@@ -1,0 +1,54 @@
+[
+  {
+    "name": "Startup",
+    "enabled": false,
+    "template": "image_text_cta_side_by_side",
+    "content": {
+      "imageUrl": "https://www.vitahomedecor.co.uk/_next/image?url=https%3A%2F%2Fwoocommerce-1531534-5907618.cloudwaysapps.com%2Fwp-content%2Fuploads%2F2025%2F10%2Fpicture-of-scandinavian-style-dining-table.avif&w=828&q=75",
+      "imageAlt": "coffee",
+      "title": "30% off this weekend. Buy Now!",
+      "subtitle": "Free shipping on all orders!",
+      "ctaLabel": "I want in!",
+      "ctaHref": "https://www.vitahomedecor.co.uk/product/scandinavian-style-dining-table",
+      "closeLabel": "I'll pass",
+      "textColor": "#111827",
+      "titleColor": "#754729",
+      "subtitleColor": "#404040",
+      "ctaTextColor": "#ffffff",
+      "ctaBgColor": "#754729",
+      "panelBgColor": "#fff9f0"
+    },
+    "behaviour": {
+      "triggers": {
+        "onLoadDelayMs": 10000,
+        "onScrollPercent": 30,
+        "exitIntent": true
+      },
+      "frequency": {
+        "oncePerSession": false,
+        "coolDownDays": 0
+      },
+      "targeting": {
+        "mode": "include",
+        "paths": [
+          "/product/*"
+        ]
+      }
+    },
+    "animation": {
+      "enter": "slide-right",
+      "exit": "fade",
+      "durationMs": 250,
+      "overlay": false
+    },
+    "metrics": {
+      "impressions": 4,
+      "clicks": 1,
+      "lastShownAt": "2025-10-21T14:23:22.645Z",
+      "lastClickedAt": "2025-10-21T12:57:05.144Z"
+    },
+    "id": "3dPB5p6smk",
+    "createdAt": "2025-10-21T12:54:16.391Z",
+    "updatedAt": "2025-10-22T09:13:55.140Z"
+  }
+]

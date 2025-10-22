@@ -10,4 +10,3 @@ export const wooApi = new WooCommerceRestApi({
 export default wooApi;
 
 export * from "./api";
-export * from "./store";

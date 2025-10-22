@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import useCart from '@/hooks/useCart';
 
@@ -9,10 +9,38 @@ export default function CheckoutProcessing() {
   const { clearCart } = useCart();
   const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
   const [message, setMessage] = useState('Processing your order...');
+  const hasProcessedRef = useRef(false);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
+    // Prevent duplicate API calls using refs (survives React Strict Mode double-render)
+    if (hasProcessedRef.current || isProcessingRef.current) {
+      console.log('Order already processed or processing, skipping...');
+      return;
+    }
+
     const processOrder = async () => {
+      // Double-check before starting
+      if (isProcessingRef.current) {
+        console.log('Already processing, aborting...');
+        return;
+      }
+
+      isProcessingRef.current = true;
       try {
+        // Check if we already have a pending order ID (already processed)
+        const existingOrderId = sessionStorage.getItem('pendingOrderId');
+        if (existingOrderId) {
+          console.log('Order already created, redirecting to payment...');
+          const orderDataStr = sessionStorage.getItem('pendingOrder');
+          if (orderDataStr) {
+            const orderData = JSON.parse(orderDataStr);
+            const checkoutUrl = `${process.env.NEXT_PUBLIC_WC_STORE_URL}/checkout/order-pay/${existingOrderId}?pay_for_order=true`;
+            window.location.href = checkoutUrl;
+            return;
+          }
+        }
+
         // Get order data from sessionStorage
         const orderDataStr = sessionStorage.getItem('pendingOrder');
         if (!orderDataStr) {
@@ -23,7 +51,9 @@ export default function CheckoutProcessing() {
 
         const orderData = JSON.parse(orderDataStr);
 
-        // Create WooCommerce order
+        console.log('Creating order via API...');
+
+        // Create WooCommerce order via new API
         const response = await fetch('/api/woo-order', {
           method: 'POST',
           headers: {
@@ -34,39 +64,49 @@ export default function CheckoutProcessing() {
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.message || 'Failed to create order');
+          throw new Error(error.error || error.message || 'Failed to create order');
         }
 
         const result = await response.json();
 
-        // Clear order data from sessionStorage
+        console.log('Order created successfully:', {
+          orderId: result.order_id,
+          checkoutUrl: result.checkout_url,
+        });
+
+        // Clear pending order from sessionStorage
         sessionStorage.removeItem('pendingOrder');
 
-        // If Stripe payment URL is returned, redirect to Stripe
-        if (result.paymentUrl) {
-          window.location.href = result.paymentUrl;
-          return;
+        // Store order ID and full order details for when user returns from WooCommerce checkout
+        sessionStorage.setItem('pendingOrderId', result.order_id.toString());
+
+        // Store full order details for the order-received page
+        if (result.order_details) {
+          sessionStorage.setItem('completedOrder', JSON.stringify(result.order_details));
         }
 
-        // Order created successfully
-        setStatus('success');
-        setMessage('Order created successfully!');
-        clearCart();
+        // Mark as successfully processed
+        hasProcessedRef.current = true;
 
-        // Redirect to success page after 2 seconds
+        // Redirect to WooCommerce checkout page
+        setStatus('success');
+        setMessage('Redirecting to payment...');
+
+        // Redirect after a brief moment to show success message
         setTimeout(() => {
-          router.push(`/checkout/success?order_id=${result.orderId}`);
-        }, 2000);
+          window.location.href = result.checkout_url;
+        }, 1000);
 
       } catch (error) {
         console.error('Order processing error:', error);
         setStatus('error');
         setMessage(error instanceof Error ? error.message : 'Failed to process order');
+        isProcessingRef.current = false; // Allow retry on error
       }
     };
 
     processOrder();
-  }, [router, clearCart]);
+  }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -93,9 +133,9 @@ export default function CheckoutProcessing() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                 </svg>
               </div>
-              <h2 className="mt-6 text-3xl font-bold text-green-600">Success!</h2>
+              <h2 className="mt-6 text-3xl font-bold text-green-600">Order Created!</h2>
               <p className="mt-2 text-sm text-gray-600">{message}</p>
-              <p className="mt-4 text-xs text-gray-500">Redirecting to order confirmation...</p>
+              <p className="mt-4 text-xs text-gray-500">You will be redirected to complete payment...</p>
             </>
           )}
 
