@@ -5,6 +5,7 @@ export default function Checkout() {
   return (
     <>
       <Banner title="Checkout" breadcrumb="Checkout" />
+      
       <CheckoutPage />
     </> 
   );
